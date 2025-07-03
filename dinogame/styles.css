@@ -1,0 +1,99 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  user-select: none;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.world {
+  overflow: hidden;
+  position: relative;
+}
+
+.score {
+  position: absolute;
+  font-size: 3vmin;
+  right: 1vmin;
+  top: 1vmin;
+}
+
+.start-screen {
+  position: absolute;
+  font-size: 5vmin;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.hide {
+  display: none;
+}
+
+.ground {
+  --left: 0;
+  position: absolute;
+  width: 300%;
+  bottom: 0;
+  left: calc(var(--left) * 1%);
+}
+
+.dino {
+  --bottom: 0;
+  position: absolute;
+  left: 1%;
+  height: 30%;
+  bottom: calc(var(--bottom) * 1%);
+}
+
+.cactus {
+  position: absolute;
+  left: calc(var(--left) * 1%);
+  height: 30%;
+  bottom: 0;
+}
+
+.top-bar {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto 12px auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 2.2vmin;
+  padding: 0 8px;
+}
+
+.top-bar label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#character-select {
+  font-size: 2vmin;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid #bbb;
+}
+
+#theme-toggle {
+  font-size: 2.2vmin;
+  padding: 2px 12px;
+  border-radius: 4px;
+  border: 1px solid #bbb;
+  background: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#theme-toggle:active {
+  background: #eee;
+}
