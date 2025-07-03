@@ -123,6 +123,48 @@ function updateBackground() {
 let dinoFrame = 0;
 let dinoLegUp = true;
 let crouch = false;
+let combo = 0;
+let maxCombo = 0;
+let lastJumpedObstacle = null;
+
+function drawCombo() {
+    if (combo > 1) {
+        ctx.font = '22px Arial';
+        ctx.fillStyle = '#FF4081';
+        ctx.fillText('Combo x' + combo, 350, 40);
+    }
+    if (maxCombo > 1) {
+        ctx.font = '16px Arial';
+        ctx.fillStyle = '#FF4081';
+        ctx.fillText('Max Combo: ' + maxCombo, 350, 65);
+    }
+}
+
+function checkCombo() {
+    // Nếu Dino vừa nhảy qua chướng ngại vật mà không va chạm
+    for (let ob of obstacles) {
+        if (
+            ob.x + ob.width < dino.x &&
+            ob !== lastJumpedObstacle &&
+            dino.isJumping &&
+            ob.x + ob.width > dino.x - 20 // chỉ tính khi vừa nhảy qua
+        ) {
+            combo++;
+            if (combo > maxCombo) maxCombo = combo;
+            lastJumpedObstacle = ob;
+            return;
+        }
+    }
+    // Nếu chạm đất mà không nhảy qua mới thì reset combo
+    if (!dino.isJumping && lastJumpedObstacle) {
+        lastJumpedObstacle = null;
+        if (combo > 1) {
+            // thưởng điểm combo
+            score += combo * 10;
+        }
+        combo = 0;
+    }
+}
 
 function drawDino() {
     let y = dino.y;
@@ -390,6 +432,9 @@ function resetGame() {
     obstacles = [createObstacle()];
     items = [];
     itemScore = 0;
+    combo = 0;
+    maxCombo = 0;
+    lastJumpedObstacle = null;
     score = 0;
     isGameOver = false;
     dino.y = 220;
@@ -406,6 +451,7 @@ function gameLoop() {
     updateDino();
     updateObstacles();
     updateItems();
+    checkCombo();
     // Hoạt ảnh chạy
     if (!dino.isJumping && !crouch && !isGameOver) {
         if (dinoFrame % 8 === 0) dinoLegUp = !dinoLegUp;
@@ -421,6 +467,7 @@ function gameLoop() {
         }
     }
     drawScore();
+    drawCombo();
     ctx.font = '18px Arial';
     ctx.fillStyle = '#1976D2';
     ctx.fillText('Item: ' + itemScore, 680, 40);
