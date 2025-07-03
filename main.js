@@ -27,6 +27,9 @@ const obstacle = {
     speed: 8
 };
 
+let score = 0;
+let isGameOver = false;
+
 function drawDino() {
     ctx.fillStyle = '#4CAF50';
     ctx.fillRect(dino.x, dino.y, dino.width, dino.height);
@@ -35,6 +38,12 @@ function drawDino() {
 function drawObstacle() {
     ctx.fillStyle = '#8B4513';
     ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+}
+
+function drawScore() {
+    ctx.font = '24px Arial';
+    ctx.fillStyle = '#333';
+    ctx.fillText('Score: ' + score, 20, 40);
 }
 
 // Xử lý nhảy
@@ -72,6 +81,16 @@ function checkCollision() {
     );
 }
 
+function resetGame() {
+    obstacle.x = 800;
+    score = 0;
+    isGameOver = false;
+    dino.y = 220;
+    dino.vy = 0;
+    dino.isJumping = false;
+    gameLoop();
+}
+
 // Hàm game loop cơ bản
 function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -79,13 +98,23 @@ function gameLoop() {
     updateObstacle();
     drawDino();
     drawObstacle();
+    drawScore();
     if (checkCollision()) {
         ctx.font = '40px Arial';
         ctx.fillStyle = 'red';
         ctx.fillText('Game Over', 300, 150);
+        isGameOver = true;
         return;
     }
+    score++;
     requestAnimationFrame(gameLoop);
 }
+
+// Restart game khi nhấn phím R
+window.addEventListener('keydown', function(e) {
+    if (isGameOver && (e.code === 'KeyR' || e.key === 'r')) {
+        resetGame();
+    }
+});
 
 gameLoop(); 
