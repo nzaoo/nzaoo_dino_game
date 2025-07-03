@@ -126,6 +126,7 @@ let crouch = false;
 let combo = 0;
 let maxCombo = 0;
 let lastJumpedObstacle = null;
+let highScore = Number(localStorage.getItem('highScore') || 0);
 
 function drawCombo() {
     if (combo > 1) {
@@ -390,6 +391,12 @@ function drawScore() {
     ctx.fillText('Score: ' + score, 20, 40);
 }
 
+function drawHighScore() {
+    ctx.font = '18px Arial';
+    ctx.fillStyle = '#009688';
+    ctx.fillText('High Score: ' + highScore, 20, 70);
+}
+
 function updateDino() {
     dino.y += dino.vy;
     dino.vy += dino.gravity;
@@ -468,6 +475,7 @@ function gameLoop() {
     }
     drawScore();
     drawCombo();
+    drawHighScore();
     ctx.font = '18px Arial';
     ctx.fillStyle = '#1976D2';
     ctx.fillText('Item: ' + itemScore, 680, 40);
@@ -475,6 +483,10 @@ function gameLoop() {
         ctx.font = '40px Arial';
         ctx.fillStyle = 'red';
         ctx.fillText('Game Over', 300, 150);
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem('highScore', highScore);
+        }
         isGameOver = true;
         return;
     }
