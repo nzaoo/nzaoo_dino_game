@@ -264,6 +264,84 @@ function drawObstacle(ob) {
     }
 }
 
+const ITEM_TYPES = ['star', 'cake', 'shield'];
+function randomItemType() {
+    return ITEM_TYPES[Math.floor(Math.random() * ITEM_TYPES.length)];
+}
+function createItem() {
+    const type = randomItemType();
+    let y = 180 + Math.random() * 60;
+    let x = 800 + Math.random() * 400;
+    return { x, y, width: 28, height: 28, speed: 7, type, collected: false };
+}
+let items = [];
+let itemScore = 0;
+
+function drawItem(item) {
+    if (item.type === 'star') {
+        ctx.save();
+        ctx.translate(item.x + 14, item.y + 14);
+        ctx.rotate(Math.PI / 10 * (score % 20));
+        ctx.fillStyle = '#FFD600';
+        for (let i = 0; i < 5; i++) {
+            ctx.beginPath();
+            ctx.moveTo(0, -12);
+            ctx.lineTo(4, -4);
+            ctx.lineTo(12, -4);
+            ctx.lineTo(6, 2);
+            ctx.lineTo(8, 10);
+            ctx.lineTo(0, 6);
+            ctx.lineTo(-8, 10);
+            ctx.lineTo(-6, 2);
+            ctx.lineTo(-12, -4);
+            ctx.lineTo(-4, -4);
+            ctx.closePath();
+            ctx.fill();
+            ctx.rotate(Math.PI * 2 / 5);
+        }
+        ctx.restore();
+    } else if (item.type === 'cake') {
+        ctx.fillStyle = '#FF7043';
+        ctx.fillRect(item.x, item.y + 10, 28, 12);
+        ctx.fillStyle = '#FFF';
+        ctx.fillRect(item.x, item.y + 6, 28, 6);
+        ctx.fillStyle = '#FFD600';
+        ctx.beginPath();
+        ctx.arc(item.x + 14, item.y + 6, 4, 0, 2 * Math.PI);
+        ctx.fill();
+    } else if (item.type === 'shield') {
+        ctx.strokeStyle = '#1976D2';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(item.x + 14, item.y + 14, 12, Math.PI, 2 * Math.PI);
+        ctx.lineTo(item.x + 14, item.y + 26);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.lineWidth = 1;
+    }
+}
+
+function updateItems() {
+    for (let item of items) {
+        item.x -= item.speed;
+    }
+    // Xóa item đã ra khỏi màn hình hoặc đã thu thập
+    items = items.filter(item => item.x + item.width > 0 && !item.collected);
+    // Thêm item mới ngẫu nhiên
+    if (items.length === 0 || (items[items.length-1].x < 400 && Math.random() < 0.02)) {
+        items.push(createItem());
+    }
+}
+
+function checkItemCollision(item) {
+    return (
+        dino.x < item.x + item.width &&
+        dino.x + dino.width > item.x &&
+        dino.y < item.y + item.height &&
+        dino.y + dino.height > item.y
+    );
+}
+
 function drawScore() {
     ctx.font = '24px Arial';
     ctx.fillStyle = '#333';
@@ -310,6 +388,8 @@ function checkCollision() {
 
 function resetGame() {
     obstacles = [createObstacle()];
+    items = [];
+    itemScore = 0;
     score = 0;
     isGameOver = false;
     dino.y = 220;
@@ -325,6 +405,7 @@ function gameLoop() {
     updateBackground();
     updateDino();
     updateObstacles();
+    updateItems();
     // Hoạt ảnh chạy
     if (!dino.isJumping && !crouch && !isGameOver) {
         if (dinoFrame % 8 === 0) dinoLegUp = !dinoLegUp;
@@ -332,7 +413,17 @@ function gameLoop() {
     }
     drawDino();
     for (let ob of obstacles) drawObstacle(ob);
+    for (let item of items) {
+        if (!item.collected) drawItem(item);
+        if (!item.collected && checkItemCollision(item)) {
+            item.collected = true;
+            itemScore += 10;
+        }
+    }
     drawScore();
+    ctx.font = '18px Arial';
+    ctx.fillStyle = '#1976D2';
+    ctx.fillText('Item: ' + itemScore, 680, 40);
     if (checkCollision()) {
         ctx.font = '40px Arial';
         ctx.fillStyle = 'red';
