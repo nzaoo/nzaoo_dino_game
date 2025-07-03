@@ -29,6 +29,12 @@ const obstacle = {
 
 let score = 0;
 let isGameOver = false;
+let isNight = false;
+let stars = Array.from({length: 30}, () => ({
+    x: Math.random() * 800,
+    y: Math.random() * 120,
+    r: Math.random() * 1.5 + 0.5
+}));
 
 // Background layers
 const skyColor = '#B3E5FC';
@@ -42,24 +48,45 @@ const clouds = [
     { x: 700, y: 80, width: 50, height: 25, speed: 1.8 }
 ];
 
+function toggleTheme() {
+    isNight = !isNight;
+}
+
+window.addEventListener('keydown', function(e) {
+    if (e.code === 'KeyT' || e.key === 't') {
+        toggleTheme();
+    }
+});
+
 function drawBackground() {
     // Sky
-    ctx.fillStyle = skyColor;
+    ctx.fillStyle = isNight ? '#22223b' : skyColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Stars (night only)
+    if (isNight) {
+        ctx.fillStyle = '#fff';
+        stars.forEach(star => {
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, star.r, 0, 2 * Math.PI);
+            ctx.fill();
+        });
+    }
     // Hills
     hills.forEach(hill => {
-        ctx.fillStyle = '#81C784';
+        ctx.fillStyle = isNight ? '#495057' : '#81C784';
         ctx.beginPath();
         ctx.ellipse(hill.x + hill.width/2, hill.y + hill.height, hill.width/2, hill.height, 0, Math.PI, 0, true);
         ctx.fill();
     });
-    // Clouds
-    clouds.forEach(cloud => {
-        ctx.fillStyle = '#fff';
-        ctx.beginPath();
-        ctx.ellipse(cloud.x, cloud.y, cloud.width, cloud.height, 0, 0, 2 * Math.PI);
-        ctx.fill();
-    });
+    // Clouds (day only)
+    if (!isNight) {
+        clouds.forEach(cloud => {
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.ellipse(cloud.x, cloud.y, cloud.width, cloud.height, 0, 0, 2 * Math.PI);
+            ctx.fill();
+        });
+    }
 }
 
 function updateBackground() {
