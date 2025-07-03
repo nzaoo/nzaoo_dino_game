@@ -5,24 +5,32 @@ import {
 } from "./updateCustomProperty.js"
 
 const dinoElem = document.querySelector("[data-dino]")
-const JUMP_SPEED = 0.45
+const JUMP_SPEED = 0.38
 const GRAVITY = 0.0015
 const DINO_FRAME_COUNT = 2
 const FRAME_TIME = 100
 const jumpSound = new Audio("imgs/jump.wav")
 
 let isJumping
+let isHoldingJump
 let dinoFrame
 let currentFrameTime
 let yVelocity
+const MAX_JUMP_HOLD_TIME = 220
+let jumpHoldTime = 0
+
 export function setupDino() {
   isJumping = false
+  isHoldingJump = false
   dinoFrame = 0
   currentFrameTime = 0
   yVelocity = 0
+  jumpHoldTime = 0
   setCustomProperty(dinoElem, "--bottom", 0)
   document.removeEventListener("keydown", onJump)
+  document.removeEventListener("keyup", onJumpRelease)
   document.addEventListener("keydown", onJump)
+  document.addEventListener("keyup", onJumpRelease)
 }
 
 export function updateDino(delta, speedScale) {
@@ -61,14 +69,27 @@ function handleJump(delta) {
   if (getCustomProperty(dinoElem, "--bottom") <= 0) {
     setCustomProperty(dinoElem, "--bottom", 0)
     isJumping = false
+    isHoldingJump = false
+    jumpHoldTime = 0
   }
 
-  yVelocity -= GRAVITY * delta
+  if (isHoldingJump && jumpHoldTime < MAX_JUMP_HOLD_TIME) {
+    yVelocity -= (GRAVITY * 0.7) * delta
+    jumpHoldTime += delta
+  } else {
+    yVelocity -= GRAVITY * delta
+  }
 }
 
 function onJump(e) {
   if (e.code !== "Space" || isJumping) return
-
   yVelocity = JUMP_SPEED
   isJumping = true
+  isHoldingJump = true
+  jumpHoldTime = 0
+}
+
+function onJumpRelease(e) {
+  if (e.code !== "Space") return
+  isHoldingJump = false
 }

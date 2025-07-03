@@ -5,8 +5,8 @@ import {
 } from "./updateCustomProperty.js"
 
 const SPEED = 0.05
-const CACTUS_INTERVAL_MIN = 500
-const CACTUS_INTERVAL_MAX = 2000
+const CACTUS_INTERVAL_MIN = 800
+const CACTUS_INTERVAL_MAX = 2200
 const worldElem = document.querySelector("[data-world]")
 
 let nextCactusTime
@@ -40,6 +40,19 @@ export function getCactusRects() {
 }
 
 function createCactus() {
+  const dino = document.querySelector('[data-dino]')
+  const dinoRect = dino.getBoundingClientRect()
+  const worldRect = document.querySelector('[data-world]').getBoundingClientRect()
+  const minDistance = worldRect.width * 0.35
+  // Kiểm tra tất cả vật cản (cactus + bird)
+  const tooClose = [
+    ...document.querySelectorAll('[data-cactus]'),
+    ...document.querySelectorAll('[data-bird]')
+  ].some(obs => {
+    const rect = obs.getBoundingClientRect()
+    return rect.left - dinoRect.right < minDistance && rect.left > dinoRect.right
+  })
+  if (tooClose) return // Không spawn nếu quá gần
   const cactus = document.createElement("img")
   cactus.dataset.cactus = true
   cactus.src = "imgs/cactus.png"
