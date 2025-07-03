@@ -127,6 +127,7 @@ let combo = 0;
 let maxCombo = 0;
 let lastJumpedObstacle = null;
 let highScore = Number(localStorage.getItem('highScore') || 0);
+let leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
 
 function drawCombo() {
     if (combo > 1) {
@@ -435,6 +436,21 @@ function checkCollision() {
     return false;
 }
 
+function updateLeaderboard(newScore) {
+    leaderboard.push(newScore);
+    leaderboard = leaderboard.sort((a, b) => b - a).slice(0, 5);
+    localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+}
+
+function drawLeaderboard() {
+    ctx.font = '16px Arial';
+    ctx.fillStyle = '#333';
+    ctx.fillText('Top 5:', 680, 70);
+    leaderboard.forEach((score, i) => {
+        ctx.fillText((i + 1) + '. ' + score, 680, 90 + i * 20);
+    });
+}
+
 function resetGame() {
     obstacles = [createObstacle()];
     items = [];
@@ -476,6 +492,7 @@ function gameLoop() {
     drawScore();
     drawCombo();
     drawHighScore();
+    drawLeaderboard();
     ctx.font = '18px Arial';
     ctx.fillStyle = '#1976D2';
     ctx.fillText('Item: ' + itemScore, 680, 40);
@@ -487,6 +504,7 @@ function gameLoop() {
             highScore = score;
             localStorage.setItem('highScore', highScore);
         }
+        updateLeaderboard(score);
         isGameOver = true;
         return;
     }
