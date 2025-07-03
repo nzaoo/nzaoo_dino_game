@@ -11,11 +11,17 @@ const worldElem = document.querySelector("[data-world]")
 
 let bossActive = false
 let bossTimeout = null
+let projectiles = []
+const PROJECTILE_SPEED = 0.18
+const PROJECTILE_INTERVAL = 1200 // ms
+let projectileIntervalId = null
 
 export function setupBoss() {
   removeBoss()
   bossActive = false
   if (bossTimeout) clearTimeout(bossTimeout)
+  clearProjectiles()
+  if (projectileIntervalId) clearInterval(projectileIntervalId)
 }
 
 export function updateBoss(delta, score, onBossStart, onBossEnd) {
@@ -27,7 +33,13 @@ export function updateBoss(delta, score, onBossStart, onBossEnd) {
       removeBoss()
       bossActive = false
       onBossEnd && onBossEnd()
+      clearProjectiles()
+      if (projectileIntervalId) clearInterval(projectileIntervalId)
     }, BOSS_DURATION)
+    // Bắt đầu bắn đạn
+    projectileIntervalId = setInterval(() => {
+      if (bossActive) spawnProjectile()
+    }, PROJECTILE_INTERVAL)
   }
   // Di chuyển boss nếu đang active
   const boss = document.querySelector('[data-boss]')
@@ -37,8 +49,18 @@ export function updateBoss(delta, score, onBossStart, onBossEnd) {
       removeBoss()
       bossActive = false
       onBossEnd && onBossEnd()
+      clearProjectiles()
+      if (projectileIntervalId) clearInterval(projectileIntervalId)
     }
   }
+  // Di chuyển đạn
+  projectiles.forEach(p => {
+    incrementCustomProperty(p, "--left", delta * PROJECTILE_SPEED * -1)
+    if (getCustomProperty(p, "--left") <= -10) {
+      p.remove()
+    }
+  })
+  projectiles = projectiles.filter(p => p.isConnected)
 }
 
 export function getBossRect() {
@@ -48,6 +70,10 @@ export function getBossRect() {
 
 export function isBossActive() {
   return bossActive
+}
+
+export function getBossProjectiles() {
+  return projectiles.map(p => p.getBoundingClientRect())
 }
 
 function spawnBoss() {
@@ -63,4 +89,20 @@ function spawnBoss() {
 
 function removeBoss() {
   document.querySelectorAll('[data-boss]').forEach(boss => boss.remove())
+}
+
+function spawnProjectile() {
+  const boss = document.querySelector('[data-boss]')
+  if (!boss) return
+  const projectile = document.createElement('div')
+  projectile.classList.add('boss-projectile')
+  setCustomProperty(projectile, '--left', getCustomProperty(boss, '--left'))
+  setCustomProperty(projectile, '--bottom', 20)
+  worldElem.append(projectile)
+  projectiles.push(projectile)
+}
+
+function clearProjectiles() {
+  projectiles.forEach(p => p.remove())
+  projectiles = []
 } 

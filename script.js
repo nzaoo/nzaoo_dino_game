@@ -3,7 +3,7 @@ import { updateDino, setupDino, getDinoRect, setDinoLose } from "./dino.js"
 import { updateCactus, setupCactus, getCactusRects } from "./cactus.js"
 import { updateBird, setupBird, getBirdRects } from "./bird.js"
 import { updatePowerup, setupPowerup, getIsInvincible, activateInvincibility } from "./powerup.js"
-import { updateBoss, setupBoss, getBossRect, isBossActive } from "./boss.js"
+import { updateBoss, setupBoss, getBossRect, isBossActive, getBossProjectiles } from "./boss.js"
 
 const WORLD_WIDTH = 100
 const WORLD_HEIGHT = 30
@@ -78,6 +78,7 @@ function checkLose() {
   if (getIsInvincible()) return false
   const bossRect = getBossRect()
   if (bossRect && isBossActive() && isCollision(bossRect, dinoRect)) return true
+  if (getBossProjectiles().some(rect => isCollision(rect, dinoRect))) return true
   return (
     getCactusRects().some(rect => isCollision(shrinkRect(rect, 5), dinoRect)) ||
     getBirdRects().some(rect => isCollision(shrinkRect(rect, 5), dinoRect))
