@@ -2,66 +2,66 @@
 
 ![Game Screenshot](imgs/dino-run-0.png)
 
-## 🦖 Giới thiệu
+## 🦖 Introduction
 
-Dino Game Plus là phiên bản mở rộng của game khủng long vượt chướng ngại vật nổi tiếng, với nhiều tính năng mới như boss, power-up, combo, nhiều loại vật cản, tăng tốc, v.v. Game được xây dựng hoàn toàn bằng HTML, CSS, JavaScript thuần.
+Dino Game Plus is an enhanced version of the classic dinosaur runner game, featuring new mechanics such as bosses, power-ups, combos, diverse obstacles, speed scaling, and more. The game is built entirely with vanilla HTML, CSS, and JavaScript.
 
-## 🚀 Tính năng nổi bật
+## 🚀 Key Features
 
-- **Nhảy giữ lực:** Nhấn giữ phím Space để nhảy cao hơn, thả ra để dino rơi xuống nhanh hơn.
-- **Chướng ngại vật đa dạng:** Xương rồng, chim bay, boss, đạn boss...
-- **Tăng tốc dần:** Game sẽ tăng tốc theo thời gian và điểm số.
-- **Power-up:** Nhặt vật phẩm để bất tử trong thời gian ngắn.
-- **Combo né tránh:** Né liên tiếp nhiều vật cản sẽ nhận điểm thưởng combo.
-- **Boss:** Đạt mốc điểm sẽ xuất hiện boss, boss bắn đạn, phải vừa né boss vừa né đạn.
-- **Giao diện đẹp, hiệu ứng mượt mà, hỗ trợ desktop và mobile.**
+- **Hold-to-jump:** Hold the Space key to jump higher, release to fall faster.
+- **Diverse obstacles:** Cactus, flying birds, boss, boss projectiles, and more.
+- **Progressive speed:** The game speeds up over time and as your score increases.
+- **Power-ups:** Collect items to become invincible for a short period.
+- **Dodge combo:** Successfully dodge multiple obstacles in a row to earn combo bonus points.
+- **Boss battles:** Reach score milestones to face a boss that shoots projectiles—dodge both the boss and its bullets!
+- **Polished UI, smooth effects, desktop & mobile support.**
 
-## 🎮 Cách chơi
+## 🎮 How to Play
 
-- **Bắt đầu:** Nhấn bất kỳ phím nào để bắt đầu.
-- **Nhảy:** Nhấn hoặc giữ phím `Space` (hoặc chạm màn hình trên mobile).
-- **Né chướng ngại vật:** Nhảy qua xương rồng, chim, boss và đạn boss.
-- **Nhặt power-up:** Để bất tử tạm thời.
-- **Cố gắng đạt combo để nhận nhiều điểm hơn!**
+- **Start:** Press any key to begin.
+- **Jump:** Press or hold `Space` (or tap the screen on mobile).
+- **Dodge obstacles:** Jump over cactus, birds, boss, and boss projectiles.
+- **Collect power-ups:** Become invincible for a few seconds.
+- **Aim for combos to maximize your score!**
 
 ## ⌨️ Controls
 
-| Hành động   | Phím/Thao tác         |
-| ----------- | --------------------- |
-| Nhảy        | Space / Chạm màn hình |
-| Bắt đầu lại | Space / Bất kỳ phím   |
+| Action  | Key/Control        |
+| ------- | ------------------ |
+| Jump    | Space / Tap screen |
+| Restart | Space / Any key    |
 
-## 🏆 Điểm số & Combo
+## 🏆 Scoring & Combos
 
-- Điểm tăng dần theo thời gian sống sót.
-- Mỗi 3 lần né liên tiếp sẽ nhận combo +100 điểm.
-- Nhặt power-up sẽ bất tử trong 4 giây.
-- Đạt mốc điểm sẽ gặp boss, boss bắn đạn, né càng lâu điểm càng cao.
+- Score increases as you survive longer.
+- Every 3 consecutive dodges grants a combo bonus (+100 points).
+- Collecting a power-up grants 4 seconds of invincibility.
+- Reach score milestones to trigger boss battles—dodge for even more points!
 
-## 🖼️ Ảnh & Tài sản
+## 🖼️ Assets
 
-- Ảnh nhân vật, vật cản, nền... nằm trong thư mục `imgs/`.
-- Bạn có thể thay thế ảnh boss, bird, power-up... để cá nhân hóa game.
+- All images (characters, obstacles, backgrounds, etc.) are in the `imgs/` folder.
+- You can replace boss, bird, or power-up images to customize your game.
 
-## 🛠️ Cài đặt & Chạy game
+## 🛠️ Setup & Run
 
-1. Clone repo về máy:
+1. Clone the repository:
    ```bash
    git clone https://github.com/nzaoo/nzaoo_dino_game.git
    ```
-2. Mở file `index.html` bằng trình duyệt (Chrome, Edge, Firefox...)
-3. Chơi và tận hưởng!
+2. Open `index.html` in your browser (Chrome, Edge, Firefox, etc.)
+3. Play and enjoy!
 
-## 🤝 Đóng góp
+## 🤝 Contributing
 
-- Fork repo, tạo branch mới, commit và gửi pull request.
-- Đóng góp ý tưởng, code, hình ảnh, hiệu ứng đều được hoan nghênh!
+- Fork the repo, create a new branch, commit your changes, and submit a pull request.
+- Ideas, code, images, and effects contributions are all welcome!
 
-## 📄 Bản quyền
+## 📄 License
 
-- Dự án phát triển phi lợi nhuận, phục vụ học tập và giải trí.
-- Bạn được phép sử dụng, chỉnh sửa, chia sẻ với ghi chú nguồn gốc.
+- This project is non-commercial, for learning and entertainment purposes only.
+- You are free to use, modify, and share with attribution.
 
 ---
 
-Chúc bạn chơi game vui vẻ và phá đảo mọi kỷ lục! 🦖✨
+Enjoy the game and break your high score! 🦖✨
