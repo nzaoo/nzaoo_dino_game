@@ -64,6 +64,18 @@ window.addEventListener('keydown', function(e) {
     if (e.code === 'KeyT' || e.key === 't') {
         toggleTheme();
     }
+    if ((e.code === 'Space' || e.key === ' ') && !dino.isJumping) {
+        dino.vy = dino.jumpPower;
+        dino.isJumping = true;
+    }
+    if (e.code === 'ArrowDown' || e.key === 'ArrowDown') {
+        crouch = true;
+    }
+});
+window.addEventListener('keyup', function(e) {
+    if (e.code === 'ArrowDown' || e.key === 'ArrowDown') {
+        crouch = false;
+    }
 });
 
 function drawBackground() {
@@ -108,42 +120,90 @@ function updateBackground() {
     });
 }
 
+let dinoFrame = 0;
+let dinoLegUp = true;
+let crouch = false;
+
 function drawDino() {
+    let y = dino.y;
+    let height = dino.height;
+    // Khi cúi thì thấp hơn
+    if (crouch && !dino.isJumping) {
+        height = 28;
+        y = dino.y + 16;
+    }
     if (characterType === 'dino') {
         ctx.fillStyle = '#4CAF50';
-        ctx.fillRect(dino.x, dino.y, dino.width, dino.height);
+        ctx.fillRect(dino.x, y, dino.width, height);
         // Đầu khủng long
         ctx.fillStyle = '#388E3C';
-        ctx.fillRect(dino.x + 28, dino.y + 8, 16, 16);
+        ctx.fillRect(dino.x + 28, y + 8, 16, 16);
+        // Chân động
+        ctx.fillStyle = '#2e7d32';
+        if (!dino.isJumping && !crouch) {
+            if (dinoLegUp) {
+                ctx.fillRect(dino.x + 6, y + height, 8, 12);
+                ctx.fillRect(dino.x + 30, y + height, 8, 6);
+            } else {
+                ctx.fillRect(dino.x + 6, y + height, 8, 6);
+                ctx.fillRect(dino.x + 30, y + height, 8, 12);
+            }
+        } else if (dino.isJumping) {
+            ctx.fillRect(dino.x + 10, y + height, 8, 6);
+            ctx.fillRect(dino.x + 28, y + height, 8, 6);
+        }
     } else if (characterType === 'cat') {
-        // Thân mèo
         ctx.fillStyle = '#FFD600';
-        ctx.fillRect(dino.x, dino.y, dino.width, dino.height);
-        // Tai mèo
+        ctx.fillRect(dino.x, y, dino.width, height);
         ctx.fillStyle = '#FFA000';
         ctx.beginPath();
-        ctx.moveTo(dino.x + 8, dino.y);
-        ctx.lineTo(dino.x + 16, dino.y - 12);
-        ctx.lineTo(dino.x + 24, dino.y);
+        ctx.moveTo(dino.x + 8, y);
+        ctx.lineTo(dino.x + 16, y - 12);
+        ctx.lineTo(dino.x + 24, y);
         ctx.closePath();
         ctx.fill();
         ctx.beginPath();
-        ctx.moveTo(dino.x + 32, dino.y);
-        ctx.lineTo(dino.x + 36, dino.y - 10);
-        ctx.lineTo(dino.x + 40, dino.y);
+        ctx.moveTo(dino.x + 32, y);
+        ctx.lineTo(dino.x + 36, y - 10);
+        ctx.lineTo(dino.x + 40, y);
         ctx.closePath();
         ctx.fill();
+        // Chân động
+        ctx.fillStyle = '#FFA000';
+        if (!dino.isJumping && !crouch) {
+            if (dinoLegUp) {
+                ctx.fillRect(dino.x + 8, y + height, 6, 10);
+                ctx.fillRect(dino.x + 28, y + height, 6, 5);
+            } else {
+                ctx.fillRect(dino.x + 8, y + height, 6, 5);
+                ctx.fillRect(dino.x + 28, y + height, 6, 10);
+            }
+        } else if (dino.isJumping) {
+            ctx.fillRect(dino.x + 12, y + height, 6, 5);
+            ctx.fillRect(dino.x + 26, y + height, 6, 5);
+        }
     } else if (characterType === 'robot') {
-        // Thân robot
         ctx.fillStyle = '#90A4AE';
-        ctx.fillRect(dino.x, dino.y, dino.width, dino.height);
-        // Đầu robot
+        ctx.fillRect(dino.x, y, dino.width, height);
         ctx.fillStyle = '#607D8B';
-        ctx.fillRect(dino.x + 10, dino.y - 18, 24, 18);
-        // Mắt robot
+        ctx.fillRect(dino.x + 10, y - 18, 24, 18);
         ctx.fillStyle = '#fff';
-        ctx.fillRect(dino.x + 16, dino.y - 10, 4, 4);
-        ctx.fillRect(dino.x + 28, dino.y - 10, 4, 4);
+        ctx.fillRect(dino.x + 16, y - 10, 4, 4);
+        ctx.fillRect(dino.x + 28, y - 10, 4, 4);
+        // Chân động
+        ctx.fillStyle = '#263238';
+        if (!dino.isJumping && !crouch) {
+            if (dinoLegUp) {
+                ctx.fillRect(dino.x + 8, y + height, 6, 10);
+                ctx.fillRect(dino.x + 28, y + height, 6, 5);
+            } else {
+                ctx.fillRect(dino.x + 8, y + height, 6, 5);
+                ctx.fillRect(dino.x + 28, y + height, 6, 10);
+            }
+        } else if (dino.isJumping) {
+            ctx.fillRect(dino.x + 12, y + height, 6, 5);
+            ctx.fillRect(dino.x + 26, y + height, 6, 5);
+        }
     }
 }
 
@@ -157,14 +217,6 @@ function drawScore() {
     ctx.fillStyle = '#333';
     ctx.fillText('Score: ' + score, 20, 40);
 }
-
-// Xử lý nhảy
-window.addEventListener('keydown', function(e) {
-    if ((e.code === 'Space' || e.key === ' ') && !dino.isJumping) {
-        dino.vy = dino.jumpPower;
-        dino.isJumping = true;
-    }
-});
 
 function updateDino() {
     dino.y += dino.vy;
@@ -210,6 +262,11 @@ function gameLoop() {
     updateBackground();
     updateDino();
     updateObstacle();
+    // Hoạt ảnh chạy
+    if (!dino.isJumping && !crouch && !isGameOver) {
+        if (dinoFrame % 8 === 0) dinoLegUp = !dinoLegUp;
+        dinoFrame++;
+    }
     drawDino();
     drawObstacle();
     drawScore();
