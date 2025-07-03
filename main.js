@@ -78,6 +78,36 @@ window.addEventListener('keyup', function(e) {
     }
 });
 
+// Mobile controls
+const btnJump = document.getElementById('btn-jump');
+const btnCrouch = document.getElementById('btn-crouch');
+const btnTheme = document.getElementById('btn-theme');
+if (btnJump) {
+    btnJump.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        if (!dino.isJumping && !isGameOver) {
+            dino.vy = dino.jumpPower;
+            dino.isJumping = true;
+        }
+    });
+}
+if (btnCrouch) {
+    btnCrouch.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        crouch = true;
+    });
+    btnCrouch.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        crouch = false;
+    });
+}
+if (btnTheme) {
+    btnTheme.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        toggleTheme();
+    });
+}
+
 function drawBackground() {
     // Sky
     ctx.fillStyle = isNight ? '#22223b' : skyColor;
