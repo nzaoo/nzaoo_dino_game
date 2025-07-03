@@ -48,6 +48,14 @@ const clouds = [
     { x: 700, y: 80, width: 50, height: 25, speed: 1.8 }
 ];
 
+let characterType = 'dino';
+const characterSelect = document.getElementById('character');
+if (characterSelect) {
+    characterSelect.addEventListener('change', function(e) {
+        characterType = e.target.value;
+    });
+}
+
 function toggleTheme() {
     isNight = !isNight;
 }
@@ -101,8 +109,42 @@ function updateBackground() {
 }
 
 function drawDino() {
-    ctx.fillStyle = '#4CAF50';
-    ctx.fillRect(dino.x, dino.y, dino.width, dino.height);
+    if (characterType === 'dino') {
+        ctx.fillStyle = '#4CAF50';
+        ctx.fillRect(dino.x, dino.y, dino.width, dino.height);
+        // Đầu khủng long
+        ctx.fillStyle = '#388E3C';
+        ctx.fillRect(dino.x + 28, dino.y + 8, 16, 16);
+    } else if (characterType === 'cat') {
+        // Thân mèo
+        ctx.fillStyle = '#FFD600';
+        ctx.fillRect(dino.x, dino.y, dino.width, dino.height);
+        // Tai mèo
+        ctx.fillStyle = '#FFA000';
+        ctx.beginPath();
+        ctx.moveTo(dino.x + 8, dino.y);
+        ctx.lineTo(dino.x + 16, dino.y - 12);
+        ctx.lineTo(dino.x + 24, dino.y);
+        ctx.closePath();
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(dino.x + 32, dino.y);
+        ctx.lineTo(dino.x + 36, dino.y - 10);
+        ctx.lineTo(dino.x + 40, dino.y);
+        ctx.closePath();
+        ctx.fill();
+    } else if (characterType === 'robot') {
+        // Thân robot
+        ctx.fillStyle = '#90A4AE';
+        ctx.fillRect(dino.x, dino.y, dino.width, dino.height);
+        // Đầu robot
+        ctx.fillStyle = '#607D8B';
+        ctx.fillRect(dino.x + 10, dino.y - 18, 24, 18);
+        // Mắt robot
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(dino.x + 16, dino.y - 10, 4, 4);
+        ctx.fillRect(dino.x + 28, dino.y - 10, 4, 4);
+    }
 }
 
 function drawObstacle() {
