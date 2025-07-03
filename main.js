@@ -30,6 +30,49 @@ const obstacle = {
 let score = 0;
 let isGameOver = false;
 
+// Background layers
+const skyColor = '#B3E5FC';
+const hills = [
+    { x: 0, y: 200, width: 300, height: 80, speed: 1.5 },
+    { x: 400, y: 220, width: 250, height: 60, speed: 1.2 }
+];
+const clouds = [
+    { x: 100, y: 60, width: 60, height: 30, speed: 2 },
+    { x: 350, y: 40, width: 80, height: 40, speed: 1.5 },
+    { x: 700, y: 80, width: 50, height: 25, speed: 1.8 }
+];
+
+function drawBackground() {
+    // Sky
+    ctx.fillStyle = skyColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Hills
+    hills.forEach(hill => {
+        ctx.fillStyle = '#81C784';
+        ctx.beginPath();
+        ctx.ellipse(hill.x + hill.width/2, hill.y + hill.height, hill.width/2, hill.height, 0, Math.PI, 0, true);
+        ctx.fill();
+    });
+    // Clouds
+    clouds.forEach(cloud => {
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.ellipse(cloud.x, cloud.y, cloud.width, cloud.height, 0, 0, 2 * Math.PI);
+        ctx.fill();
+    });
+}
+
+function updateBackground() {
+    hills.forEach(hill => {
+        hill.x -= hill.speed;
+        if (hill.x + hill.width < 0) hill.x = canvas.width;
+    });
+    clouds.forEach(cloud => {
+        cloud.x -= cloud.speed;
+        if (cloud.x + cloud.width < 0) cloud.x = canvas.width + Math.random() * 100;
+    });
+}
+
 function drawDino() {
     ctx.fillStyle = '#4CAF50';
     ctx.fillRect(dino.x, dino.y, dino.width, dino.height);
@@ -94,6 +137,8 @@ function resetGame() {
 // Hàm game loop cơ bản
 function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawBackground();
+    updateBackground();
     updateDino();
     updateObstacle();
     drawDino();
