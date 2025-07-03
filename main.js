@@ -23,9 +23,29 @@ function drawDino() {
     ctx.fillRect(dino.x, dino.y, dino.width, dino.height);
 }
 
+// Xử lý nhảy
+window.addEventListener('keydown', function(e) {
+    if ((e.code === 'Space' || e.key === ' ') && !dino.isJumping) {
+        dino.vy = dino.jumpPower;
+        dino.isJumping = true;
+    }
+});
+
+function updateDino() {
+    dino.y += dino.vy;
+    dino.vy += dino.gravity;
+    // Chạm đất
+    if (dino.y >= 220) {
+        dino.y = 220;
+        dino.vy = 0;
+        dino.isJumping = false;
+    }
+}
+
 // Hàm game loop cơ bản
 function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    updateDino();
     drawDino();
     // Sẽ vẽ game ở đây
     requestAnimationFrame(gameLoop);
