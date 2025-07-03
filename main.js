@@ -207,9 +207,61 @@ function drawDino() {
     }
 }
 
-function drawObstacle() {
-    ctx.fillStyle = '#8B4513';
-    ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+const OBSTACLE_TYPES = ['cactus', 'bird', 'rock', 'trap'];
+function randomObstacleType() {
+    return OBSTACLE_TYPES[Math.floor(Math.random() * OBSTACLE_TYPES.length)];
+}
+
+function createObstacle() {
+    const type = randomObstacleType();
+    let y = 240, width = 20, height = 40, speed = 8;
+    if (type === 'bird') {
+        y = Math.random() > 0.5 ? 180 : 120;
+        width = 40; height = 24;
+        speed = 10;
+    } else if (type === 'rock') {
+        width = 32; height = 32;
+        y = 248;
+        speed = 7;
+    } else if (type === 'trap') {
+        width = 36; height = 18;
+        y = 262;
+        speed = 8.5;
+    }
+    return { x: 800, y, width, height, speed, type };
+}
+
+let obstacles = [createObstacle()];
+
+function drawObstacle(ob) {
+    if (ob.type === 'cactus') {
+        ctx.fillStyle = '#8B4513';
+        ctx.fillRect(ob.x, ob.y, ob.width, ob.height);
+        ctx.fillStyle = '#388E3C';
+        ctx.fillRect(ob.x + 4, ob.y - 16, 12, 16);
+    } else if (ob.type === 'bird') {
+        ctx.fillStyle = '#424242';
+        ctx.beginPath();
+        ctx.ellipse(ob.x + ob.width/2, ob.y + ob.height/2, ob.width/2, ob.height/2, 0, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(ob.x + ob.width - 8, ob.y + ob.height/2 - 2, 6, 4);
+    } else if (ob.type === 'rock') {
+        ctx.fillStyle = '#757575';
+        ctx.beginPath();
+        ctx.arc(ob.x + ob.width/2, ob.y + ob.height/2, ob.width/2, 0, 2 * Math.PI);
+        ctx.fill();
+    } else if (ob.type === 'trap') {
+        ctx.fillStyle = '#b71c1c';
+        ctx.fillRect(ob.x, ob.y, ob.width, ob.height);
+        ctx.strokeStyle = '#fff';
+        for (let i = 0; i < ob.width; i += 6) {
+            ctx.beginPath();
+            ctx.moveTo(ob.x + i, ob.y);
+            ctx.lineTo(ob.x + i + 3, ob.y - 8);
+            ctx.stroke();
+        }
+    }
 }
 
 function drawScore() {
@@ -229,24 +281,35 @@ function updateDino() {
     }
 }
 
-function updateObstacle() {
-    obstacle.x -= obstacle.speed;
-    if (obstacle.x + obstacle.width < 0) {
-        obstacle.x = 800 + Math.random() * 200;
+function updateObstacles() {
+    for (let i = 0; i < obstacles.length; i++) {
+        obstacles[i].x -= obstacles[i].speed;
+    }
+    // Xóa chướng ngại vật đã ra khỏi màn hình và thêm mới
+    if (obstacles.length === 0 || obstacles[obstacles.length-1].x < 400) {
+        obstacles.push(createObstacle());
+    }
+    if (obstacles[0].x + obstacles[0].width < 0) {
+        obstacles.shift();
     }
 }
 
 function checkCollision() {
-    return (
-        dino.x < obstacle.x + obstacle.width &&
-        dino.x + dino.width > obstacle.x &&
-        dino.y < obstacle.y + obstacle.height &&
-        dino.y + dino.height > obstacle.y
-    );
+    for (let ob of obstacles) {
+        if (
+            dino.x < ob.x + ob.width &&
+            dino.x + dino.width > ob.x &&
+            dino.y < ob.y + ob.height &&
+            dino.y + dino.height > ob.y
+        ) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function resetGame() {
-    obstacle.x = 800;
+    obstacles = [createObstacle()];
     score = 0;
     isGameOver = false;
     dino.y = 220;
@@ -261,14 +324,14 @@ function gameLoop() {
     drawBackground();
     updateBackground();
     updateDino();
-    updateObstacle();
+    updateObstacles();
     // Hoạt ảnh chạy
     if (!dino.isJumping && !crouch && !isGameOver) {
         if (dinoFrame % 8 === 0) dinoLegUp = !dinoLegUp;
         dinoFrame++;
     }
     drawDino();
-    drawObstacle();
+    for (let ob of obstacles) drawObstacle(ob);
     drawScore();
     if (checkCollision()) {
         ctx.font = '40px Arial';
