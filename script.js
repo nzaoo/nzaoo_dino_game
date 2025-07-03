@@ -3,6 +3,7 @@ import { updateDino, setupDino, getDinoRect, setDinoLose } from "./dino.js"
 import { updateCactus, setupCactus, getCactusRects } from "./cactus.js"
 import { updateBird, setupBird, getBirdRects } from "./bird.js"
 import { updatePowerup, setupPowerup, getIsInvincible, activateInvincibility } from "./powerup.js"
+import { updateBoss, setupBoss, getBossRect, isBossActive } from "./boss.js"
 
 const WORLD_WIDTH = 100
 const WORLD_HEIGHT = 30
@@ -38,6 +39,7 @@ let lastObstaclePassed = null
 let comboTimeout = null
 const COMBO_REQUIRE = 3
 const COMBO_BONUS = 100
+let bossPause = false
 
 function update(time) {
   if (lastTime == null) {
@@ -50,16 +52,17 @@ function update(time) {
 
   updateGround(delta, speedScale)
   updateDino(delta, speedScale)
-  updateCactus(delta, speedScale)
-  updateBird(delta, speedScale)
-  updatePowerup(delta, speedScale, () => {
-    activateInvincibility(() => {
-      // Kết thúc hiệu ứng bất tử
-      document.querySelector('[data-dino]').style.filter = ''
+  if (!bossPause) {
+    updateCactus(delta, speedScale)
+    updateBird(delta, speedScale)
+    updatePowerup(delta, speedScale, () => {
+      activateInvincibility(() => {
+        document.querySelector('[data-dino]').style.filter = ''
+      })
+      document.querySelector('[data-dino]').style.filter = 'drop-shadow(0 0 16px yellow) brightness(1.3)';
     })
-    // Hiệu ứng dino bất tử
-    document.querySelector('[data-dino]').style.filter = 'drop-shadow(0 0 16px yellow) brightness(1.3)';
-  })
+  }
+  updateBoss(delta, score, () => { bossPause = true }, () => { bossPause = false })
   updateCombo()
   updateSpeedScale(delta)
   updateScore(delta)
@@ -73,6 +76,8 @@ function update(time) {
 function checkLose() {
   const dinoRect = shrinkRect(getDinoRect(), 5)
   if (getIsInvincible()) return false
+  const bossRect = getBossRect()
+  if (bossRect && isBossActive() && isCollision(bossRect, dinoRect)) return true
   return (
     getCactusRects().some(rect => isCollision(shrinkRect(rect, 5), dinoRect)) ||
     getBirdRects().some(rect => isCollision(shrinkRect(rect, 5), dinoRect))
@@ -175,10 +180,12 @@ function handleStart() {
   setupCactus()
   setupBird()
   setupPowerup()
+  setupBoss()
   document.querySelector('[data-dino]').style.filter = ''
   comboCount = 0
   comboElem.textContent = ''
   lastObstaclePassed = null
+  bossPause = false
   startScreenElem.classList.add("hide")
   window.requestAnimationFrame(update)
 }
