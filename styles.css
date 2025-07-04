@@ -75,6 +75,14 @@ body {
   bottom: 0;
 }
 
+.rock {
+  position: absolute;
+  left: calc(var(--left) * 1%);
+  height: 18%;
+  bottom: 0;
+  z-index: 2;
+}
+
 .bird {
   position: absolute;
   left: calc(var(--left) * 1%);
