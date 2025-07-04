@@ -24,6 +24,8 @@ document.addEventListener("keydown", handleStart, { once: true })
 
 let lastTime
 let speedScale
+let speedScaleTarget = 1
+const SPEED_SCALE_SMOOTH_STEP = 0.01 // tốc độ tăng dần mỗi frame
 let score
 let highScore = Number(localStorage.getItem("highScore")) || 0
 highScoreElem.textContent = `High Score: ${highScore}`
@@ -107,7 +109,12 @@ function shrinkRect(rect, amount) {
 }
 
 function updateSpeedScale(delta) {
-  speedScale += delta * SPEED_SCALE_INCREASE
+  // Tăng dần speedScale về speedScaleTarget
+  if (speedScale < speedScaleTarget) {
+    speedScale = Math.min(speedScale + SPEED_SCALE_SMOOTH_STEP, speedScaleTarget)
+  } else {
+    speedScale += delta * SPEED_SCALE_INCREASE
+  }
 }
 
 function updateScore(delta) {
@@ -123,12 +130,12 @@ function updateScore(delta) {
 function checkSpeedBoost(time) {
   // Tăng tốc mỗi 30 giây
   if (time - lastSpeedBoostTime > SPEED_BOOST_INTERVAL_MS) {
-    speedScale += SPEED_BOOST_AMOUNT
+    speedScaleTarget += SPEED_BOOST_AMOUNT
     lastSpeedBoostTime = time
   }
   // Tăng tốc mỗi 500 điểm
   if (score - lastSpeedBoostScore > SPEED_BOOST_SCORE) {
-    speedScale += SPEED_BOOST_AMOUNT
+    speedScaleTarget += SPEED_BOOST_AMOUNT
     lastSpeedBoostScore = score
   }
 }
@@ -176,6 +183,7 @@ function showComboEffect(count) {
 function handleStart() {
   lastTime = null
   speedScale = 1
+  speedScaleTarget = 1
   score = 0
   highScoreElem.textContent = `High Score: ${highScore}`
   lastSpeedBoostTime = 0
