@@ -1,10 +1,8 @@
 import { updateGround, setupGround } from "./ground.js"
 import { updateDino, setupDino, getDinoRect, setDinoLose } from "./dino.js"
 import { updateCactus, setupCactus, getCactusRects } from "./cactus.js"
-import { updateBird, setupBird, getBirdRects } from "./bird.js"
 import { updatePowerup, setupPowerup, getIsInvincible, activateInvincibility } from "./powerup.js"
 import { updateBoss, setupBoss, getBossRect, isBossActive, getBossProjectiles } from "./boss.js"
-import { updateRock, setupRock, getRockRects } from "./rock.js"
 
 const WORLD_WIDTH = 100
 const WORLD_HEIGHT = 30
@@ -57,8 +55,6 @@ function update(time) {
   updateDino(delta, speedScale)
   if (!bossPause) {
     updateCactus(delta, speedScale)
-    updateBird(delta, speedScale)
-    updateRock(delta, speedScale)
     updatePowerup(delta, speedScale, () => {
       activateInvincibility(() => {
         document.querySelector('[data-dino]').style.filter = ''
@@ -84,9 +80,7 @@ function checkLose() {
   if (bossRect && isBossActive() && isCollision(bossRect, dinoRect)) return true
   if (getBossProjectiles().some(rect => isCollision(rect, dinoRect))) return true
   return (
-    getCactusRects().some(rect => isCollision(shrinkRect(rect, 5), dinoRect)) ||
-    getBirdRects().some(rect => isCollision(shrinkRect(rect, 5), dinoRect)) ||
-    getRockRects().some(rect => isCollision(shrinkRect(rect, 5), dinoRect))
+    getCactusRects().some(rect => isCollision(shrinkRect(rect, 5), dinoRect))
   )
 }
 
@@ -143,9 +137,7 @@ function checkSpeedBoost(time) {
 function updateCombo() {
   // Lấy tất cả chướng ngại vật
   const obstacles = [
-    ...document.querySelectorAll('[data-cactus]'),
-    ...document.querySelectorAll('[data-bird]'),
-    ...document.querySelectorAll('[data-rock]')
+    ...document.querySelectorAll('[data-cactus]')
   ]
   const dinoRect = shrinkRect(getDinoRect(), 5)
   let passed = false
@@ -191,8 +183,6 @@ function handleStart() {
   setupGround()
   setupDino()
   setupCactus()
-  setupBird()
-  setupRock()
   setupPowerup()
   setupBoss()
   document.querySelector('[data-dino]').style.filter = ''
