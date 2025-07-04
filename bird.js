@@ -2,6 +2,7 @@ import {
   setCustomProperty,
   incrementCustomProperty,
   getCustomProperty,
+  isObstacleTooCloseByLeft,
 } from "./updateCustomProperty.js"
 
 const SPEED = 0.07
@@ -41,19 +42,10 @@ export function getBirdRects() {
 }
 
 function createBird() {
-  const dino = document.querySelector('[data-dino]')
-  const dinoRect = dino.getBoundingClientRect()
   const worldRect = document.querySelector('[data-world]').getBoundingClientRect()
-  const minDistance = worldRect.width * 0.35 // tăng lên 35%
-  // Kiểm tra tất cả vật cản (cactus + bird)
-  const tooClose = [
-    ...document.querySelectorAll('[data-cactus]'),
-    ...document.querySelectorAll('[data-bird]')
-  ].some(obs => {
-    const rect = obs.getBoundingClientRect()
-    return rect.left - dinoRect.right < minDistance && rect.left > dinoRect.right
-  })
-  if (tooClose) return // Không spawn nếu quá gần
+  const minDistance = worldRect.width * 0.35
+  const newLeft = worldRect.right
+  if (isObstacleTooCloseByLeft(newLeft, minDistance)) return // Không spawn nếu quá gần vật cản khác
   const bird = document.createElement("img")
   bird.dataset.bird = true
   bird.src = "imgs/rock.png" // tạm dùng ảnh rock, sau sẽ thay bằng bird

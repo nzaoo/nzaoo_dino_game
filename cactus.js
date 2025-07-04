@@ -2,6 +2,7 @@ import {
   setCustomProperty,
   incrementCustomProperty,
   getCustomProperty,
+  isObstacleTooCloseByLeft,
 } from "./updateCustomProperty.js"
 
 const SPEED = 0.05
@@ -40,19 +41,11 @@ export function getCactusRects() {
 }
 
 function createCactus() {
-  const dino = document.querySelector('[data-dino]')
-  const dinoRect = dino.getBoundingClientRect()
   const worldRect = document.querySelector('[data-world]').getBoundingClientRect()
   const minDistance = worldRect.width * 0.35
-  // Kiểm tra tất cả vật cản (cactus + bird)
-  const tooClose = [
-    ...document.querySelectorAll('[data-cactus]'),
-    ...document.querySelectorAll('[data-bird]')
-  ].some(obs => {
-    const rect = obs.getBoundingClientRect()
-    return rect.left - dinoRect.right < minDistance && rect.left > dinoRect.right
-  })
-  if (tooClose) return // Không spawn nếu quá gần
+  // Lấy vị trí left (px) muốn spawn
+  const newLeft = worldRect.right
+  if (isObstacleTooCloseByLeft(newLeft, minDistance)) return // Không spawn nếu quá gần vật cản khác
   const cactus = document.createElement("img")
   cactus.dataset.cactus = true
   cactus.src = "imgs/cactus.png"

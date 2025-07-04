@@ -2,6 +2,7 @@ import {
   setCustomProperty,
   incrementCustomProperty,
   getCustomProperty,
+  isObstacleTooCloseByLeft,
 } from "./updateCustomProperty.js"
 
 const SPEED = 0.05
@@ -34,20 +35,10 @@ export function updateRock(delta, speedScale) {
 }
 
 function createRock() {
-  const dino = document.querySelector('[data-dino]')
-  const dinoRect = dino.getBoundingClientRect()
   const worldRect = document.querySelector('[data-world]').getBoundingClientRect()
   const minDistance = worldRect.width * 0.35
-  // Kiểm tra tất cả vật cản (cactus + bird + rock)
-  const tooClose = [
-    ...document.querySelectorAll('[data-cactus]'),
-    ...document.querySelectorAll('[data-bird]'),
-    ...document.querySelectorAll('[data-rock]')
-  ].some(obs => {
-    const rect = obs.getBoundingClientRect()
-    return rect.left - dinoRect.right < minDistance && rect.left > dinoRect.right
-  })
-  if (tooClose) return // Không spawn nếu quá gần
+  const newLeft = worldRect.right
+  if (isObstacleTooCloseByLeft(newLeft, minDistance)) return // Không spawn nếu quá gần vật cản khác
   const rock = document.createElement("img")
   rock.dataset.rock = true
   rock.src = "imgs/rock.png"
