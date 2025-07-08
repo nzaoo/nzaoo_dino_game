@@ -181,6 +181,21 @@ function setupEventListeners() {
   
   // Click to start
   startScreenElem.addEventListener('click', startGame)
+
+  const characterBtns = document.querySelectorAll('.character-btn')
+  let selectedCharacter = localStorage.getItem('selectedCharacter') || 'green'
+
+  characterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedCharacter = btn.dataset.character
+      localStorage.setItem('selectedCharacter', selectedCharacter)
+      characterBtns.forEach(b => b.classList.remove('selected'))
+      btn.classList.add('selected')
+    })
+    if (btn.dataset.character === selectedCharacter) {
+      btn.classList.add('selected')
+    }
+  })
 }
 
 function handleKeyPress(event) {

@@ -20,6 +20,15 @@ const MAX_JUMP_HOLD_TIME = 220
 let jumpHoldTime = 0
 
 export function setupDino() {
+  const dino = document.querySelector('[data-dino]')
+  const selectedCharacter = localStorage.getItem('selectedCharacter') || 'green'
+  if (selectedCharacter === 'red') {
+    dino.src = 'imgs/dino-red.png'
+  } else if (selectedCharacter === 'yellow') {
+    dino.src = 'imgs/dino-yellow.png'
+  } else {
+    dino.src = 'imgs/dino-run-0.png'
+  }
   isJumping = false
   isHoldingJump = false
   dinoFrame = 0
