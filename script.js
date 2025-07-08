@@ -196,6 +196,21 @@ function setupEventListeners() {
       btn.classList.add('selected')
     }
   })
+
+  const modeBtns = document.querySelectorAll('.mode-btn')
+  let selectedMode = localStorage.getItem('selectedMode') || 'classic'
+
+  modeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedMode = btn.dataset.mode
+      localStorage.setItem('selectedMode', selectedMode)
+      modeBtns.forEach(b => b.classList.remove('selected'))
+      btn.classList.add('selected')
+    })
+    if (btn.dataset.mode === selectedMode) {
+      btn.classList.add('selected')
+    }
+  })
 }
 
 function handleKeyPress(event) {
@@ -221,12 +236,34 @@ function startGame() {
   startScreenElem.classList.remove('hide')
   isGameRunning = true
   resetGameState()
-  
+
+  // Áp dụng logic từng chế độ
+  if (selectedMode === 'hard') {
+    speedScale = 1.5
+    speedScaleTarget = 1.5
+    // Có thể tăng tần suất chướng ngại vật ở các file khác nếu muốn
+  } else if (selectedMode === 'endless') {
+    speedScale = 1
+    speedScaleTarget = 1
+    // Không tăng tốc độ trong updateSpeedScale
+    window.isEndlessMode = true
+  } else if (selectedMode === 'time') {
+    speedScale = 1
+    speedScaleTarget = 1
+    window.isTimeAttack = true
+    window.timeAttackTime = 30000 // 30 giây
+  } else {
+    speedScale = 1
+    speedScaleTarget = 1
+    window.isEndlessMode = false
+    window.isTimeAttack = false
+  }
+
   // Start background music if enabled
   if (gameSettings.musicEnabled && !isMuted) {
     startBackgroundMusic()
   }
-  
+
   handleStart()
 }
 
@@ -445,9 +482,24 @@ function shrinkRect(rect, amount) {
 }
 
 function updateSpeedScale(delta) {
-  // Không tăng tốc độ nữa, giữ nguyên speedScale
-  speedScale = 1.0
-  speedScaleTarget = 1.0
+  if (window.isEndlessMode) {
+    speedScale = 1
+    speedScaleTarget = 1
+    return
+  }
+  if (window.isTimeAttack) {
+    window.timeAttackTime -= delta
+    if (window.timeAttackTime <= 0) {
+      isGameRunning = false
+      showGameOver()
+      return
+    }
+  }
+  if (speedScale < speedScaleTarget) {
+    speedScale = Math.min(speedScale + SPEED_SCALE_SMOOTH_STEP, speedScaleTarget)
+  } else {
+    speedScale += delta * SPEED_SCALE_INCREASE
+  }
 }
 
 function updateScore(delta) {
