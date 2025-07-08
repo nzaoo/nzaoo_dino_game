@@ -56,6 +56,12 @@ const hitSound = new Audio("imgs/hit.wav")
 let backgroundMusic = null
 let isMuted = false
 
+// Âm thanh vật phẩm
+const soundPowerupInv = new Audio('imgs/powerup-inv.wav')
+const soundPowerupScore = new Audio('imgs/powerup-score.wav')
+const soundPowerupJump = new Audio('imgs/powerup-jump.wav')
+const soundModeChange = new Audio('imgs/mode-change.wav')
+
 // Game State
 let lastTime
 let speedScale
@@ -104,6 +110,7 @@ window.jumpPower = jumpPower
 window.addEventListener("powerup:score", () => {
   score += 200
   scoreElem.textContent = Math.floor(score)
+  soundPowerupScore.currentTime = 0; soundPowerupScore.play()
 })
 
 window.addEventListener("powerup:jump", () => {
@@ -114,6 +121,19 @@ window.addEventListener("powerup:jump", () => {
     jumpPower = DEFAULT_JUMP_POWER
     window.jumpPower = jumpPower
   }, JUMP_BOOST_DURATION)
+  soundPowerupJump.currentTime = 0; soundPowerupJump.play()
+})
+
+window.addEventListener("powerup:invincibility", () => {
+  soundPowerupInv.currentTime = 0; soundPowerupInv.play()
+})
+
+// Phát âm thanh khi đổi chế độ chơi
+const modeBtns = document.querySelectorAll('.mode-btn')
+modeBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    soundModeChange.currentTime = 0; soundModeChange.play()
+  })
 })
 
 // Initialize the game

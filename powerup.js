@@ -59,6 +59,7 @@ export function updatePowerup(delta, speedScale, onGetPowerup) {
       pu.remove()
       if (type === "invincibility") {
         onGetPowerup && onGetPowerup()
+        window.dispatchEvent(new CustomEvent("powerup:invincibility"))
       } else if (type === "score") {
         // Tăng điểm
         window.dispatchEvent(new CustomEvent("powerup:score"))
