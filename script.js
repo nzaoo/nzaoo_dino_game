@@ -6,35 +6,86 @@ import { updateBoss, setupBoss, getBossRect, isBossActive, getBossProjectiles } 
 
 const WORLD_WIDTH = 100
 const WORLD_HEIGHT = 30
-const SPEED_SCALE_INCREASE = 0.00001
+const SPEED_SCALE_INCREASE = 0.000002
 
+// DOM Elements
 const worldElem = document.querySelector("[data-world]")
 const scoreElem = document.querySelector("[data-score]")
 const startScreenElem = document.querySelector("[data-start-screen]")
 const highScoreElem = document.querySelector("[data-high-score]")
 const comboElem = document.querySelector('[data-combo]')
 
+// Menu Elements
+const mainMenuElem = document.querySelector("[data-main-menu]")
+const playBtn = document.querySelector("[data-play-btn]")
+const instructionsBtn = document.querySelector("[data-instructions-btn]")
+const leaderboardBtn = document.querySelector("[data-leaderboard-btn]")
+const settingsBtn = document.querySelector("[data-settings-btn]")
+
+// Modal Elements
+const instructionsModal = document.querySelector("[data-instructions-modal]")
+const leaderboardModal = document.querySelector("[data-leaderboard-modal]")
+const settingsModal = document.querySelector("[data-settings-modal]")
+const gameoverModal = document.querySelector("[data-gameover-modal]")
+const pauseMenu = document.querySelector("[data-pause-menu]")
+
+// Game Over Elements
+const finalScoreElem = document.querySelector("[data-final-score]")
+const finalHighscoreElem = document.querySelector("[data-final-highscore]")
+const finalComboElem = document.querySelector("[data-final-combo]")
+const restartBtn = document.querySelector("[data-restart-btn]")
+const mainMenuBtn = document.querySelector("[data-main-menu-btn]")
+
+// Pause Elements
+const pauseBtn = document.querySelector("[data-pause-btn]")
+const resumeBtn = document.querySelector("[data-resume-btn]")
+const pauseMainMenuBtn = document.querySelector("[data-pause-main-menu-btn]")
+
+// Settings Elements
+const soundToggle = document.querySelector("[data-sound-toggle]")
+const musicToggle = document.querySelector("[data-music-toggle]")
+const difficultySelect = document.querySelector("[data-difficulty-select]")
+const themeSelect = document.querySelector("[data-theme-select]")
+
+// Loading Elements
+const loadingScreen = document.querySelector("[data-loading-screen]")
+const loadingProgress = document.querySelector("[data-loading-progress]")
+
+// Audio
 const hitSound = new Audio("imgs/hit.wav")
+let backgroundMusic = null
+let isMuted = false
 
-setPixelToWorldScale()
-window.addEventListener("resize", setPixelToWorldScale)
-document.addEventListener("keydown", handleStart, { once: true })
-
+// Game State
 let lastTime
 let speedScale
 let speedScaleTarget = 1
-const SPEED_SCALE_SMOOTH_STEP = 0.01 // tốc độ tăng dần mỗi frame
+const SPEED_SCALE_SMOOTH_STEP = 0.01
 let score
 let highScore = Number(localStorage.getItem("highScore")) || 0
-highScoreElem.textContent = `High Score: ${highScore}`
+let maxCombo = 0
+let isPaused = false
+let isGameRunning = false
 
-// Thêm các mốc tăng tốc
-const SPEED_BOOST_INTERVAL_MS = 30000 // 30 giây
+// Settings
+let gameSettings = {
+  soundEnabled: true,
+  musicEnabled: false,
+  difficulty: 'normal',
+  theme: 'default'
+}
+
+// Load settings from localStorage
+loadSettings()
+
+// Speed boost variables
+const SPEED_BOOST_INTERVAL_MS = 30000
 const SPEED_BOOST_SCORE = 500
-const SPEED_BOOST_AMOUNT = 0.2
+const SPEED_BOOST_AMOUNT = 0.05
 let lastSpeedBoostTime = 0
 let lastSpeedBoostScore = 0
 
+// Combo system
 let comboCount = 0
 let lastObstaclePassed = null
 let comboTimeout = null
@@ -42,13 +93,266 @@ const COMBO_REQUIRE = 3
 const COMBO_BONUS = 100
 let bossPause = false
 
+// Initialize the game
+init()
+
+function init() {
+  showLoadingScreen()
+  setupEventListeners()
+  loadLeaderboard()
+  setTimeout(() => {
+    hideLoadingScreen()
+    showMainMenu()
+  }, 2000)
+}
+
+function showLoadingScreen() {
+  loadingScreen.style.display = 'flex'
+  let progress = 0
+  const interval = setInterval(() => {
+    progress += Math.random() * 30
+    if (progress > 100) progress = 100
+    loadingProgress.style.width = `${progress}%`
+    if (progress >= 100) {
+      clearInterval(interval)
+    }
+  }, 100)
+}
+
+function hideLoadingScreen() {
+  loadingScreen.style.display = 'none'
+}
+
+function setupEventListeners() {
+  // Menu buttons
+  playBtn.addEventListener('click', startGame)
+  instructionsBtn.addEventListener('click', () => showModal(instructionsModal))
+  leaderboardBtn.addEventListener('click', () => showModal(leaderboardModal))
+  settingsBtn.addEventListener('click', () => showModal(settingsModal))
+
+  // Close buttons
+  document.querySelector("[data-close-instructions]").addEventListener('click', () => hideModal(instructionsModal))
+  document.querySelector("[data-close-leaderboard]").addEventListener('click', () => hideModal(leaderboardModal))
+  document.querySelector("[data-close-settings]").addEventListener('click', () => hideModal(settingsModal))
+
+  // Game over buttons
+  restartBtn.addEventListener('click', restartGame)
+  mainMenuBtn.addEventListener('click', showMainMenu)
+  pauseMainMenuBtn.addEventListener('click', showMainMenu)
+
+  // Pause buttons
+  pauseBtn.addEventListener('click', togglePause)
+  resumeBtn.addEventListener('click', togglePause)
+
+  // Settings
+  soundToggle.addEventListener('change', updateSettings)
+  musicToggle.addEventListener('change', updateSettings)
+  difficultySelect.addEventListener('change', updateSettings)
+  themeSelect.addEventListener('change', updateSettings)
+
+  // Clear leaderboard
+  document.querySelector("[data-clear-leaderboard]").addEventListener('click', clearLeaderboard)
+
+  // Keyboard events
+  document.addEventListener('keydown', handleKeyPress)
+  
+  // Click to start
+  startScreenElem.addEventListener('click', startGame)
+}
+
+function handleKeyPress(event) {
+  if (event.code === 'Space' && !isGameRunning) {
+    event.preventDefault()
+    startGame()
+  } else if (event.code === 'Escape' && isGameRunning) {
+    event.preventDefault()
+    togglePause()
+  }
+}
+
+function showMainMenu() {
+  mainMenuElem.style.display = 'flex'
+  worldElem.classList.remove('show')
+  isGameRunning = false
+  resetGameState()
+}
+
+function startGame() {
+  mainMenuElem.style.display = 'none'
+  worldElem.classList.add('show')
+  startScreenElem.classList.remove('hide')
+  isGameRunning = true
+  resetGameState()
+  
+  // Start background music if enabled
+  if (gameSettings.musicEnabled && !isMuted) {
+    startBackgroundMusic()
+  }
+  
+  handleStart()
+}
+
+function resetGameState() {
+  lastTime = null
+  speedScale = 0.5
+  speedScaleTarget = 0.5
+  score = 0
+  maxCombo = 0
+  comboCount = 0
+  lastObstaclePassed = null
+  bossPause = false
+  isPaused = false
+  
+  // Reset UI
+  scoreElem.textContent = '0'
+  comboElem.textContent = ''
+  pauseMenu.classList.remove('show')
+  
+  // Setup game elements
+  setupGround()
+  setupDino()
+  setupCactus()
+  setupPowerup()
+  setupBoss()
+  
+  document.querySelector('[data-dino]').style.filter = ''
+}
+
+function togglePause() {
+  if (!isGameRunning) return
+  
+  isPaused = !isPaused
+  if (isPaused) {
+    pauseMenu.classList.add('show')
+  } else {
+    pauseMenu.classList.remove('show')
+  }
+}
+
+function restartGame() {
+  hideModal(gameoverModal)
+  startGame()
+}
+
+function showModal(modal) {
+  modal.classList.add('show')
+}
+
+function hideModal(modal) {
+  modal.classList.remove('show')
+}
+
+function showGameOver() {
+  finalScoreElem.textContent = Math.floor(score)
+  finalHighscoreElem.textContent = highScore
+  finalComboElem.textContent = maxCombo
+  
+  // Add to leaderboard
+  addToLeaderboard(Math.floor(score))
+  
+  showModal(gameoverModal)
+}
+
+function updateSettings() {
+  gameSettings.soundEnabled = soundToggle.checked
+  gameSettings.musicEnabled = musicToggle.checked
+  gameSettings.difficulty = difficultySelect.value
+  gameSettings.theme = themeSelect.value
+  
+  // Apply theme
+  document.body.className = `theme-${gameSettings.theme}`
+  
+  // Handle music
+  if (gameSettings.musicEnabled && isGameRunning && !isMuted) {
+    startBackgroundMusic()
+  } else {
+    stopBackgroundMusic()
+  }
+  
+  // Save settings
+  localStorage.setItem('gameSettings', JSON.stringify(gameSettings))
+}
+
+function loadSettings() {
+  const saved = localStorage.getItem('gameSettings')
+  if (saved) {
+    gameSettings = { ...gameSettings, ...JSON.parse(saved) }
+    
+    // Apply settings to UI
+    soundToggle.checked = gameSettings.soundEnabled
+    musicToggle.checked = gameSettings.musicEnabled
+    difficultySelect.value = gameSettings.difficulty
+    themeSelect.value = gameSettings.theme
+    
+    // Apply theme
+    document.body.className = `theme-${gameSettings.theme}`
+  }
+}
+
+function startBackgroundMusic() {
+  // Placeholder for background music
+  // In a real implementation, you would load and play background music here
+  console.log('Background music started')
+}
+
+function stopBackgroundMusic() {
+  // Placeholder for stopping background music
+  console.log('Background music stopped')
+}
+
+function loadLeaderboard() {
+  const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]')
+  const leaderboardList = document.querySelector("[data-leaderboard-list]")
+  leaderboardList.innerHTML = ''
+  
+  leaderboard.forEach((entry, index) => {
+    const item = document.createElement('div')
+    item.className = 'leaderboard-item'
+    item.innerHTML = `
+      <span class="leaderboard-rank">#${index + 1}</span>
+      <span>${entry.score}</span>
+      <span>${new Date(entry.date).toLocaleDateString()}</span>
+    `
+    leaderboardList.appendChild(item)
+  })
+}
+
+function addToLeaderboard(score) {
+  const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]')
+  leaderboard.push({
+    score: score,
+    date: new Date().toISOString()
+  })
+  
+  // Sort by score (highest first) and keep only top 10
+  leaderboard.sort((a, b) => b.score - a.score)
+  leaderboard.splice(10)
+  
+  localStorage.setItem('leaderboard', JSON.stringify(leaderboard))
+  loadLeaderboard()
+}
+
+function clearLeaderboard() {
+  localStorage.removeItem('leaderboard')
+  loadLeaderboard()
+}
+
+setPixelToWorldScale()
+window.addEventListener("resize", setPixelToWorldScale)
+
 function update(time) {
   if (lastTime == null) {
     lastTime = time
-    lastSpeedBoostTime = time // reset mốc tăng tốc
+    lastSpeedBoostTime = time
     window.requestAnimationFrame(update)
     return
   }
+  
+  if (isPaused || !isGameRunning) {
+    window.requestAnimationFrame(update)
+    return
+  }
+  
   const delta = time - lastTime
 
   updateGround(delta, speedScale)
@@ -103,12 +407,9 @@ function shrinkRect(rect, amount) {
 }
 
 function updateSpeedScale(delta) {
-  // Tăng dần speedScale về speedScaleTarget
-  if (speedScale < speedScaleTarget) {
-    speedScale = Math.min(speedScale + SPEED_SCALE_SMOOTH_STEP, speedScaleTarget)
-  } else {
-    speedScale += delta * SPEED_SCALE_INCREASE
-  }
+  // Không tăng tốc độ nữa, giữ nguyên speedScale
+  speedScale = 1.0
+  speedScaleTarget = 1.0
 }
 
 function updateScore(delta) {
@@ -122,12 +423,10 @@ function updateScore(delta) {
 }
 
 function checkSpeedBoost(time) {
-  // Tăng tốc mỗi 30 giây
   if (time - lastSpeedBoostTime > SPEED_BOOST_INTERVAL_MS) {
     speedScaleTarget += SPEED_BOOST_AMOUNT
     lastSpeedBoostTime = time
   }
-  // Tăng tốc mỗi 500 điểm
   if (score - lastSpeedBoostScore > SPEED_BOOST_SCORE) {
     speedScaleTarget += SPEED_BOOST_AMOUNT
     lastSpeedBoostScore = score
@@ -135,7 +434,6 @@ function checkSpeedBoost(time) {
 }
 
 function updateCombo() {
-  // Lấy tất cả chướng ngại vật
   const obstacles = [
     ...document.querySelectorAll('[data-cactus]')
   ]
@@ -143,21 +441,21 @@ function updateCombo() {
   let passed = false
   obstacles.forEach(obs => {
     const rect = shrinkRect(obs.getBoundingClientRect(), 5)
-    // Nếu vật cản đã đi qua dino mà chưa tính combo
     if (rect.right < dinoRect.left && obs !== lastObstaclePassed) {
       comboCount++
+      maxCombo = Math.max(maxCombo, comboCount)
       lastObstaclePassed = obs
       passed = true
     }
   })
-  // Nếu va chạm thì reset combo
+  
   if (checkLose()) {
     comboCount = 0
     comboElem.textContent = ''
     lastObstaclePassed = null
     return
   }
-  // Nếu đạt combo, thưởng điểm và hiện hiệu ứng
+  
   if (comboCount > 0 && comboCount % COMBO_REQUIRE === 0 && passed) {
     score += COMBO_BONUS
     showComboEffect(comboCount)
@@ -195,13 +493,14 @@ function handleStart() {
 }
 
 function handleLose() {
-  hitSound.currentTime = 0
-  hitSound.play()
+  if (gameSettings.soundEnabled && !isMuted) {
+    hitSound.currentTime = 0
+    hitSound.play()
+  }
   setDinoLose()
-  setTimeout(() => {
-    document.addEventListener("keydown", handleStart, { once: true })
-    startScreenElem.classList.remove("hide")
-  }, 100)
+  stopBackgroundMusic()
+  isGameRunning = false
+  showGameOver()
 }
 
 function setPixelToWorldScale() {

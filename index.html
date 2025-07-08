@@ -4,19 +4,188 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Dino Runner Game</title>
   <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
   <script src="script.js" type="module"></script>
 </head>
 <body>
+  <!-- Main Menu -->
+  <div class="main-menu" data-main-menu>
+    <div class="menu-container">
+      <h1 class="game-title">DINO RUNNER</h1>
+      <div class="menu-buttons">
+        <button class="menu-btn play-btn" data-play-btn>PLAY GAME</button>
+        <button class="menu-btn" data-instructions-btn>INSTRUCTIONS</button>
+        <button class="menu-btn" data-leaderboard-btn>LEADERBOARD</button>
+        <button class="menu-btn" data-settings-btn>SETTINGS</button>
+      </div>
+      <div class="menu-footer">
+        <p>Press SPACE or CLICK to jump</p>
+        <p>Collect powerups and avoid obstacles!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Instructions Modal -->
+  <div class="modal" data-instructions-modal>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>HOW TO PLAY</h2>
+        <button class="close-btn" data-close-instructions>&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="instruction-item">
+          <h3>🎮 Controls</h3>
+          <p><strong>SPACE</strong> or <strong>CLICK</strong> - Jump</p>
+          <p><strong>ESC</strong> - Pause game</p>
+        </div>
+        <div class="instruction-item">
+          <h3>🎯 Objectives</h3>
+          <p>• Jump over cacti and rocks</p>
+          <p>• Collect golden powerups for invincibility</p>
+          <p>• Build combos for bonus points</p>
+          <p>• Survive boss battles</p>
+        </div>
+        <div class="instruction-item">
+          <h3>⭐ Scoring</h3>
+          <p>• Base score increases over time</p>
+          <p>• Combo bonus: +100 points every 3 obstacles</p>
+          <p>• Speed increases every 30 seconds</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaderboard Modal -->
+  <div class="modal" data-leaderboard-modal>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>LEADERBOARD</h2>
+        <button class="close-btn" data-close-leaderboard>&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="leaderboard-list" data-leaderboard-list>
+          <!-- Leaderboard items will be populated by JavaScript -->
+        </div>
+        <button class="clear-leaderboard-btn" data-clear-leaderboard>CLEAR LEADERBOARD</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal" data-settings-modal>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>SETTINGS</h2>
+        <button class="close-btn" data-close-settings>&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="setting-item">
+          <label for="sound-toggle">Sound Effects</label>
+          <input type="checkbox" id="sound-toggle" data-sound-toggle checked>
+        </div>
+        <div class="setting-item">
+          <label for="music-toggle">Background Music</label>
+          <input type="checkbox" id="music-toggle" data-music-toggle>
+        </div>
+        <div class="setting-item">
+          <label for="difficulty-select">Difficulty</label>
+          <select id="difficulty-select" data-difficulty-select>
+            <option value="easy">Easy</option>
+            <option value="normal" selected>Normal</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
+        <div class="setting-item">
+          <label for="theme-select">Theme</label>
+          <select id="theme-select" data-theme-select>
+            <option value="default" selected>Default</option>
+            <option value="night">Night Mode</option>
+            <option value="retro">Retro</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Over Modal -->
+  <div class="modal" data-gameover-modal>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>GAME OVER</h2>
+      </div>
+      <div class="modal-body">
+        <div class="gameover-stats">
+          <div class="stat-item">
+            <span class="stat-label">Score:</span>
+            <span class="stat-value" data-final-score>0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">High Score:</span>
+            <span class="stat-value" data-final-highscore>0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Max Combo:</span>
+            <span class="stat-value" data-final-combo>0</span>
+          </div>
+        </div>
+        <div class="gameover-buttons">
+          <button class="menu-btn play-btn" data-restart-btn>PLAY AGAIN</button>
+          <button class="menu-btn" data-main-menu-btn>MAIN MENU</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pause Menu -->
+  <div class="pause-menu" data-pause-menu>
+    <div class="pause-content">
+      <h2>PAUSED</h2>
+      <div class="pause-buttons">
+        <button class="menu-btn" data-resume-btn>RESUME</button>
+        <button class="menu-btn" data-pause-main-menu-btn>MAIN MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game World -->
   <div class="world" data-world>
-    <div class="score" data-score>0</div>
-    <div class="high-score" data-high-score>High Score: 0</div>
-    <div class="combo" data-combo></div>
-    <div class="start-screen" data-start-screen>Press Any Key To Start</div>
+    <div class="game-header">
+      <div class="score" data-score>0</div>
+      <div class="high-score" data-high-score>High Score: 0</div>
+      <div class="combo" data-combo></div>
+    </div>
+    
+    <div class="game-controls">
+      <button class="control-btn pause-btn" data-pause-btn>⏸️</button>
+      <button class="control-btn mute-btn" data-mute-btn>🔊</button>
+    </div>
+
+    <div class="start-screen" data-start-screen>
+      <div class="start-content">
+        <h2>READY TO RUN?</h2>
+        <p>Press SPACE or CLICK to start</p>
+        <div class="loading-animation">
+          <div class="dino-preview"></div>
+        </div>
+      </div>
+    </div>
+
     <img src="imgs/ground.png" class="ground" data-ground>
     <img src="imgs/ground.png" class="ground" data-ground>
     <img src="imgs/dino-stationary.png" class="dino" data-dino>
+  </div>
+
+  <!-- Loading Screen -->
+  <div class="loading-screen" data-loading-screen>
+    <div class="loading-content">
+      <div class="loading-dino"></div>
+      <h2>Loading...</h2>
+      <div class="loading-bar">
+        <div class="loading-progress" data-loading-progress></div>
+      </div>
+    </div>
   </div>
 </body>
 </html>
