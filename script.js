@@ -93,6 +93,29 @@ const COMBO_REQUIRE = 3
 const COMBO_BONUS = 100
 let bossPause = false
 
+// Jump power
+let jumpPower = 1 // mặc định
+const DEFAULT_JUMP_POWER = 1
+const BOOSTED_JUMP_POWER = 1.7
+const JUMP_BOOST_DURATION = 5000
+let jumpBoostTimeout = null
+window.jumpPower = jumpPower
+
+window.addEventListener("powerup:score", () => {
+  score += 200
+  scoreElem.textContent = Math.floor(score)
+})
+
+window.addEventListener("powerup:jump", () => {
+  jumpPower = BOOSTED_JUMP_POWER
+  window.jumpPower = jumpPower
+  if (jumpBoostTimeout) clearTimeout(jumpBoostTimeout)
+  jumpBoostTimeout = setTimeout(() => {
+    jumpPower = DEFAULT_JUMP_POWER
+    window.jumpPower = jumpPower
+  }, JUMP_BOOST_DURATION)
+})
+
 // Initialize the game
 init()
 

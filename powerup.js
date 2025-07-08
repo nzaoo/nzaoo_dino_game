@@ -9,6 +9,20 @@ const POWERUP_INTERVAL_MIN = 8000
 const POWERUP_INTERVAL_MAX = 15000
 const INVINCIBILITY_DURATION = 4000 // ms
 const POWERUP_HEIGHTS = [5, 12, 20]
+const POWERUP_TYPES = {
+  invincibility: {
+    icon: "imgs/powerup-invincible.png",
+    effect: "invincibility"
+  },
+  score: {
+    icon: "imgs/powerup-score.png",
+    effect: "score"
+  },
+  jump: {
+    icon: "imgs/powerup-jump.png",
+    effect: "jump"
+  }
+}
 const worldElem = document.querySelector("[data-world]")
 
 let nextPowerupTime
@@ -41,8 +55,16 @@ export function updatePowerup(delta, speedScale, onGetPowerup) {
   const dinoRect = dino.getBoundingClientRect()
   document.querySelectorAll("[data-powerup]").forEach(pu => {
     if (isCollision(pu.getBoundingClientRect(), dinoRect)) {
+      const type = pu.dataset.powerup
       pu.remove()
-      onGetPowerup && onGetPowerup()
+      if (type === "invincibility") {
+        onGetPowerup && onGetPowerup()
+      } else if (type === "score") {
+        // Tăng điểm
+        window.dispatchEvent(new CustomEvent("powerup:score"))
+      } else if (type === "jump") {
+        window.dispatchEvent(new CustomEvent("powerup:jump"))
+      }
     }
   })
 }
@@ -52,9 +74,11 @@ export function getIsInvincible() {
 }
 
 function createPowerup() {
+  const types = Object.keys(POWERUP_TYPES)
+  const type = types[Math.floor(Math.random() * types.length)]
   const pu = document.createElement("img")
-  pu.dataset.powerup = true
-  pu.src = "imgs/dino-run-0.png" // tạm dùng ảnh dino, sau sẽ thay bằng icon powerup
+  pu.dataset.powerup = type
+  pu.src = POWERUP_TYPES[type].icon
   pu.classList.add("powerup")
   setCustomProperty(pu, "--left", 100)
   const height = POWERUP_HEIGHTS[Math.floor(Math.random() * POWERUP_HEIGHTS.length)]

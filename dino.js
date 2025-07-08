@@ -83,7 +83,7 @@ function handleJump(delta) {
 
 function onJump(e) {
   if (e.code !== "Space" || isJumping) return
-  yVelocity = JUMP_SPEED
+  yVelocity = JUMP_SPEED * (window.jumpPower || 1)
   isJumping = true
   isHoldingJump = true
   jumpHoldTime = 0
