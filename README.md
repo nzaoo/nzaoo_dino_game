@@ -1,177 +1,98 @@
-# 🦖 Dino Runner Game
+# Dino Runner Game
 
-Một game chạy nhảy kinh điển với giao diện hiện đại và nhiều tính năng thú vị!
+Một game chạy nhảy đơn giản với nhân vật khủng long, được viết bằng HTML, CSS và JavaScript.
 
-## 🎮 Tính năng chính
+## Cách chạy game
 
-### 🎯 Gameplay
+### Phương pháp 1: Sử dụng Python (Khuyến nghị)
 
-- **Chạy và nhảy**: Điều khiển khủng long chạy và nhảy qua các chướng ngại vật
-- **Powerups**: Thu thập powerups vàng để có khả năng bất tử tạm thời
-- **Combo System**: Tạo combo để nhận điểm thưởng
-- **Boss Battles**: Đối đầu với boss khó khăn
-- **Tăng tốc**: Tốc độ tăng dần theo thời gian và điểm số
+```bash
+# Mở terminal/command prompt trong thư mục game
+python -m http.server 8000
+# Sau đó mở trình duyệt và truy cập: http://localhost:8000
+```
 
-### 🎨 Giao diện mới
+### Phương pháp 2: Sử dụng Node.js
 
-- **Menu chính**: Giao diện menu đẹp mắt với các tùy chọn
-- **Hướng dẫn**: Modal hướng dẫn chơi game chi tiết
-- **Bảng xếp hạng**: Lưu trữ và hiển thị top 10 điểm cao nhất
-- **Cài đặt**: Tùy chỉnh âm thanh, độ khó và theme
-- **Pause Menu**: Tạm dừng game và quay lại menu chính
-- **Game Over Screen**: Hiển thị thống kê và tùy chọn chơi lại
-- **Loading Screen**: Màn hình loading với animation
+```bash
+# Cài đặt http-server nếu chưa có
+npm install -g http-server
+# Chạy server
+http-server
+```
 
-### 🎛️ Cài đặt
+### Phương pháp 3: Sử dụng Live Server (VS Code)
 
-- **Âm thanh**: Bật/tắt hiệu ứng âm thanh
-- **Nhạc nền**: Bật/tắt nhạc nền (placeholder)
-- **Độ khó**: Easy, Normal, Hard
-- **Theme**: Default, Night Mode, Retro
+1. Cài đặt extension "Live Server" trong VS Code
+2. Click chuột phải vào file `index.html`
+3. Chọn "Open with Live Server"
 
-### 📱 Responsive Design
+## Cách chơi
 
-- Tương thích với mọi kích thước màn hình
-- Tối ưu cho mobile và desktop
-- Giao diện thích ứng tự động
+- **Nhảy**: Nhấn phím SPACE hoặc click chuột
+- **Tạm dừng**: Nhấn phím ESC
+- **Mục tiêu**: Tránh các chướng ngại vật (cây xương rồng, đá)
+- **Thu thập**: Các powerup để tăng điểm và khả năng đặc biệt
 
-## 🚀 Cách chơi
+## Khắc phục sự cố
 
-### Điều khiển
+### Game không chạy được?
 
-- **SPACE** hoặc **CLICK**: Nhảy
-- **ESC**: Tạm dừng game
+1. **Kiểm tra console**: Mở Developer Tools (F12) và xem có lỗi gì không
+2. **Chạy test**: Mở file `test.html` để kiểm tra các file có sẵn không
+3. **Kiểm tra server**: Đảm bảo bạn đang chạy game qua HTTP server, không mở trực tiếp file HTML
 
-### Mục tiêu
+### Lỗi âm thanh?
 
-- Nhảy qua cây xương rồng và đá
-- Thu thập powerups vàng để có khả năng bất tử
-- Tạo combo để nhận điểm thưởng
-- Sống sót qua các trận boss
+- Game sẽ hoạt động bình thường ngay cả khi không có file âm thanh
+- Các lỗi âm thanh sẽ được ghi log trong console
 
-### Hệ thống điểm
+### Lỗi hình ảnh?
 
-- Điểm cơ bản tăng theo thời gian
-- Combo bonus: +100 điểm mỗi 3 chướng ngại vật
-- Tốc độ tăng mỗi 30 giây
+- Game sử dụng các hình ảnh có sẵn trong thư mục `imgs/`
+- Nếu thiếu hình ảnh, game sẽ sử dụng hình ảnh mặc định
 
-## 🛠️ Công nghệ sử dụng
-
-- **HTML5**: Cấu trúc trang web
-- **CSS3**: Styling và animations
-- **JavaScript ES6+**: Logic game và tương tác
-- **LocalStorage**: Lưu trữ điểm cao và cài đặt
-- **Google Fonts**: Font Orbitron cho giao diện
-
-## 📁 Cấu trúc dự án
+## Cấu trúc file
 
 ```
 nzaoo_dino_game/
-├── index.html          # Trang chính
+├── index.html          # Trang chính của game
+├── script.js           # Logic chính của game
+├── dino.js             # Xử lý nhân vật khủng long
+├── cactus.js           # Xử lý chướng ngại vật
+├── ground.js           # Xử lý mặt đất
+├── powerup.js          # Xử lý powerup
+├── boss.js             # Xử lý boss
+├── updateCustomProperty.js # Utility functions
 ├── styles.css          # CSS styles
-├── script.js           # Logic game chính
-├── dino.js            # Logic khủng long
-├── cactus.js          # Logic chướng ngại vật
-├── ground.js          # Logic mặt đất
-├── powerup.js         # Logic powerups
-├── boss.js            # Logic boss
-├── updateCustomProperty.js
-├── imgs/              # Thư mục hình ảnh
-│   ├── dino-run-0.png
-│   ├── dino-run-1.png
-│   ├── dino-stationary.png
-│   ├── dino-lose.png
-│   ├── cactus.png
-│   ├── ground.png
-│   └── rock.png
-└── README.md          # Hướng dẫn này
+├── test.html           # File test
+├── README.md           # Hướng dẫn này
+└── imgs/               # Thư mục hình ảnh
+    ├── dino-run-0.png
+    ├── dino-run-1.png
+    ├── dino-stationary.png
+    ├── dino-lose.png
+    ├── cactus.png
+    ├── ground.png
+    └── rock.png
 ```
 
-## 🎯 Tính năng nâng cao
+## Tính năng
 
-### Hệ thống Combo
+- ✅ Menu chính với nhiều tùy chọn
+- ✅ 3 chế độ chơi: Hard, Endless, Time Attack
+- ✅ Hệ thống combo và điểm số
+- ✅ Powerup system
+- ✅ Boss battles
+- ✅ Leaderboard
+- ✅ Settings và themes
+- ✅ Responsive design
+- ✅ Sound effects (tùy chọn)
 
-- Tạo combo khi nhảy qua nhiều chướng ngại vật liên tiếp
-- Hiệu ứng visual khi đạt combo
-- Điểm thưởng cho combo
+## Hỗ trợ
 
-### Boss System
+Nếu gặp vấn đề, hãy:
 
-- Boss xuất hiện theo điểm số
-- Boss bắn đạn
-- Tạm dừng spawn chướng ngại vật khi boss xuất hiện
-
-### Powerup System
-
-- Powerups vàng cho khả năng bất tử
-- Hiệu ứng visual khi active
-- Thời gian bất tử có giới hạn
-
-### Theme System
-
-- **Default**: Giao diện sáng với màu xanh
-- **Night Mode**: Giao diện tối với màu xanh đậm
-- **Retro**: Giao diện retro với màu nâu
-
-## 🔧 Cài đặt và chạy
-
-1. Clone hoặc download dự án
-2. Mở file `index.html` trong trình duyệt
-3. Hoặc sử dụng local server:
-
-   ```bash
-   # Sử dụng Python
-   python -m http.server 8000
-
-   # Sử dụng Node.js
-   npx serve .
-   ```
-
-## 🎨 Tùy chỉnh
-
-### Thêm theme mới
-
-1. Thêm CSS variables trong `:root`
-2. Tạo class `.theme-yourtheme`
-3. Thêm option trong HTML select
-4. Cập nhật logic trong JavaScript
-
-### Thêm powerup mới
-
-1. Tạo logic trong `powerup.js`
-2. Thêm hình ảnh vào thư mục `imgs/`
-3. Cập nhật CSS cho hiệu ứng
-
-### Thêm boss mới
-
-1. Tạo logic trong `boss.js`
-2. Thêm hình ảnh boss
-3. Cập nhật pattern tấn công
-
-## 📊 Hiệu suất
-
-- Sử dụng `requestAnimationFrame` cho smooth animation
-- Tối ưu collision detection
-- Lazy loading cho assets
-- Responsive design cho mọi thiết bị
-
-## 🐛 Báo lỗi và đóng góp
-
-Nếu bạn tìm thấy lỗi hoặc muốn đóng góp tính năng mới:
-
-1. Fork dự án
-2. Tạo branch mới
-3. Commit changes
-4. Tạo Pull Request
-
-## 📄 License
-
-Dự án này được phát hành dưới MIT License.
-
-## 🙏 Cảm ơn
-
-Cảm ơn bạn đã chơi game! Hy vọng bạn thích những tính năng mới này.
-
----
-
-**Chúc bạn chơi game vui vẻ! 🎮✨**
+1. Kiểm tra console trong Developer Tools
+2. Đảm bảo chạy game qua HTTP server
+3. Thử mở file `test.html` để kiểm tra

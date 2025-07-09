@@ -56,11 +56,19 @@ const hitSound = new Audio("imgs/hit.wav")
 let backgroundMusic = null
 let isMuted = false
 
-// Âm thanh vật phẩm
+// Âm thanh vật phẩm - thêm xử lý lỗi
 const soundPowerupInv = new Audio('imgs/powerup-inv.wav')
 const soundPowerupScore = new Audio('imgs/powerup-score.wav')
 const soundPowerupJump = new Audio('imgs/powerup-jump.wav')
 const soundModeChange = new Audio('imgs/mode-change.wav')
+
+// Xử lý lỗi audio
+const audioElements = [hitSound, soundPowerupInv, soundPowerupScore, soundPowerupJump, soundModeChange]
+audioElements.forEach(audio => {
+  audio.addEventListener('error', () => {
+    console.log('Audio file not found, continuing without sound')
+  })
+})
 
 // Game State
 let lastTime
@@ -110,7 +118,11 @@ window.jumpPower = jumpPower
 window.addEventListener("powerup:score", () => {
   score += 200
   scoreElem.textContent = Math.floor(score)
-  soundPowerupScore.currentTime = 0; soundPowerupScore.play()
+  try {
+    soundPowerupScore.currentTime = 0; soundPowerupScore.play()
+  } catch (e) {
+    console.log('Could not play sound effect')
+  }
 })
 
 window.addEventListener("powerup:jump", () => {
@@ -121,18 +133,30 @@ window.addEventListener("powerup:jump", () => {
     jumpPower = DEFAULT_JUMP_POWER
     window.jumpPower = jumpPower
   }, JUMP_BOOST_DURATION)
-  soundPowerupJump.currentTime = 0; soundPowerupJump.play()
+  try {
+    soundPowerupJump.currentTime = 0; soundPowerupJump.play()
+  } catch (e) {
+    console.log('Could not play sound effect')
+  }
 })
 
 window.addEventListener("powerup:invincibility", () => {
-  soundPowerupInv.currentTime = 0; soundPowerupInv.play()
+  try {
+    soundPowerupInv.currentTime = 0; soundPowerupInv.play()
+  } catch (e) {
+    console.log('Could not play sound effect')
+  }
 })
 
 // Phát âm thanh khi đổi chế độ chơi
 const modeBtns = document.querySelectorAll('.mode-btn')
 modeBtns.forEach(btn => {
   btn.addEventListener('click', () => {
-    soundModeChange.currentTime = 0; soundModeChange.play()
+    try {
+      soundModeChange.currentTime = 0; soundModeChange.play()
+    } catch (e) {
+      console.log('Could not play sound effect')
+    }
   })
 })
 
@@ -604,8 +628,12 @@ function handleStart() {
 
 function handleLose() {
   if (gameSettings.soundEnabled && !isMuted) {
-    hitSound.currentTime = 0
-    hitSound.play()
+    try {
+      hitSound.currentTime = 0
+      hitSound.play()
+    } catch (e) {
+      console.log('Could not play hit sound')
+    }
   }
   setDinoLose()
   stopBackgroundMusic()

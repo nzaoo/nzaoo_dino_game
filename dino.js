@@ -22,10 +22,11 @@ let jumpHoldTime = 0
 export function setupDino() {
   const dino = document.querySelector('[data-dino]')
   const selectedCharacter = localStorage.getItem('selectedCharacter') || 'green'
+  // Sử dụng hình ảnh có sẵn thay vì những file không tồn tại
   if (selectedCharacter === 'red') {
-    dino.src = 'imgs/dino-red.png'
+    dino.src = 'imgs/dino-run-0.png' // Sử dụng dino-run-0.png thay vì dino-red.png
   } else if (selectedCharacter === 'yellow') {
-    dino.src = 'imgs/dino-yellow.png'
+    dino.src = 'imgs/dino-run-1.png' // Sử dụng dino-run-1.png thay vì dino-yellow.png
   } else {
     dino.src = 'imgs/dino-run-0.png'
   }
@@ -71,7 +72,13 @@ function handleRun(delta, speedScale) {
 
 function handleJump(delta) {
   if (!isJumping) return
-  if (dinoFrame === 0) jumpSound.currentTime = 0, jumpSound.play()
+  if (dinoFrame === 0) {
+    try {
+      jumpSound.currentTime = 0, jumpSound.play()
+    } catch (e) {
+      console.log('Could not play jump sound')
+    }
+  }
 
   incrementCustomProperty(dinoElem, "--bottom", yVelocity * delta)
 
