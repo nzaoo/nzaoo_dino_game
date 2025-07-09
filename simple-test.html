@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Dino Test</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+    }
+    .game-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .game-area {
+      width: 100%;
+      height: 300px;
+      background: #87CEEB;
+      position: relative;
+      overflow: hidden;
+      border: 2px solid #333;
+    }
+    .dino {
+      width: 50px;
+      height: 50px;
+      background: #333;
+      position: absolute;
+      bottom: 0;
+      left: 50px;
+      border-radius: 5px;
+    }
+    .ground {
+      width: 100%;
+      height: 20px;
+      background: #8B4513;
+      position: absolute;
+      bottom: 0;
+    }
+    .cactus {
+      width: 20px;
+      height: 40px;
+      background: #228B22;
+      position: absolute;
+      bottom: 20px;
+      right: -20px;
+      border-radius: 3px;
+    }
+    .controls {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .btn {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    .btn:hover {
+      background: #0056b3;
+    }
+    .status {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 5px;
+      background: #e9ecef;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>Simple Dino Test</h1>
+    <p>Test cơ bản để kiểm tra game có hoạt động không</p>
+    
+    <div class="game-area">
+      <div class="dino" id="dino"></div>
+      <div class="ground"></div>
+      <div class="cactus" id="cactus"></div>
+    </div>
+    
+    <div class="controls">
+      <button class="btn" onclick="startTest()">Start Test</button>
+      <button class="btn" onclick="jump()">Jump (Space)</button>
+      <button class="btn" onclick="resetTest()">Reset</button>
+    </div>
+    
+    <div class="status" id="status">
+      Nhấn "Start Test" để bắt đầu kiểm tra
+    </div>
+  </div>
+
+  <script>
+    const dino = document.getElementById('dino');
+    const cactus = document.getElementById('cactus');
+    const status = document.getElementById('status');
+    
+    let isJumping = false;
+    let isGameRunning = false;
+    let score = 0;
+    let gameLoop;
+    
+    function updateStatus(message) {
+      status.textContent = message;
+    }
+    
+    function startTest() {
+      isGameRunning = true;
+      score = 0;
+      updateStatus('Game đang chạy! Nhấn SPACE để nhảy');
+      
+      // Reset positions
+      dino.style.bottom = '0px';
+      cactus.style.right = '-20px';
+      
+      // Start game loop
+      gameLoop = setInterval(() => {
+        if (!isGameRunning) return;
+        
+        // Move cactus
+        const currentRight = parseInt(cactus.style.right) || -20;
+        cactus.style.right = (currentRight - 5) + 'px';
+        
+        // Check collision
+        if (checkCollision()) {
+          gameOver();
+          return;
+        }
+        
+        // Check if cactus passed
+        if (currentRight < -50) {
+          score += 10;
+          updateStatus(`Score: ${score} - Game đang chạy! Nhấn SPACE để nhảy`);
+          cactus.style.right = '100%';
+        }
+        
+        // Apply gravity
+        if (isJumping) {
+          const currentBottom = parseInt(dino.style.bottom) || 0;
+          const newBottom = Math.max(0, currentBottom - 3);
+          dino.style.bottom = newBottom + 'px';
+          
+          if (newBottom === 0) {
+            isJumping = false;
+          }
+        }
+      }, 50);
+    }
+    
+    function jump() {
+      if (!isGameRunning || isJumping) return;
+      
+      isJumping = true;
+      const currentBottom = parseInt(dino.style.bottom) || 0;
+      dino.style.bottom = (currentBottom + 100) + 'px';
+      
+      updateStatus(`Jumped! Score: ${score}`);
+    }
+    
+    function checkCollision() {
+      const dinoRect = dino.getBoundingClientRect();
+      const cactusRect = cactus.getBoundingClientRect();
+      
+      return !(dinoRect.right < cactusRect.left || 
+               dinoRect.left > cactusRect.right || 
+               dinoRect.bottom < cactusRect.top || 
+               dinoRect.top > cactusRect.bottom);
+    }
+    
+    function gameOver() {
+      isGameRunning = false;
+      clearInterval(gameLoop);
+      updateStatus(`Game Over! Final Score: ${score}`);
+    }
+    
+    function resetTest() {
+      isGameRunning = false;
+      isJumping = false;
+      clearInterval(gameLoop);
+      score = 0;
+      dino.style.bottom = '0px';
+      cactus.style.right = '-20px';
+      updateStatus('Test đã reset. Nhấn "Start Test" để bắt đầu');
+    }
+    
+    // Keyboard controls
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        jump();
+      }
+    });
+    
+    // Auto test
+    window.onload = function() {
+      updateStatus('Simple test đã sẵn sàng. Nhấn "Start Test" để kiểm tra.');
+    };
+  </script>
+</body>
+</html> 

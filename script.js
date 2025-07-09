@@ -72,10 +72,10 @@ audioElements.forEach(audio => {
 
 // Game State
 let lastTime
-let speedScale
+let speedScale = 1
 let speedScaleTarget = 1
 const SPEED_SCALE_SMOOTH_STEP = 0.01
-let score
+let score = 0
 let highScore = Number(localStorage.getItem("highScore")) || 0
 let maxCombo = 0
 let isPaused = false
@@ -164,12 +164,14 @@ modeBtns.forEach(btn => {
 init()
 
 function init() {
+  console.log('Initializing game...')
   showLoadingScreen()
   setupEventListeners()
   loadLeaderboard()
   setTimeout(() => {
     hideLoadingScreen()
     showMainMenu()
+    console.log('Game initialized successfully')
   }, 2000)
 }
 
@@ -275,6 +277,7 @@ function showMainMenu() {
 }
 
 function startGame() {
+  console.log('Starting game...')
   mainMenuElem.style.display = 'none'
   worldElem.classList.add('show')
   startScreenElem.classList.remove('hide')
@@ -309,12 +312,13 @@ function startGame() {
   }
 
   handleStart()
+  console.log('Game started successfully')
 }
 
 function resetGameState() {
   lastTime = null
-  speedScale = 0.5
-  speedScaleTarget = 0.5
+  speedScale = 1
+  speedScaleTarget = 1
   score = 0
   maxCombo = 0
   comboCount = 0
