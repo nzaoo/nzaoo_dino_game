@@ -11,15 +11,15 @@ const INVINCIBILITY_DURATION = 4000 // ms
 const POWERUP_HEIGHTS = [5, 12, 20]
 const POWERUP_TYPES = {
   invincibility: {
-    icon: "imgs/powerup-invincible.png",
+    icon: "imgs/cactus.png", // Sử dụng hình ảnh có sẵn
     effect: "invincibility"
   },
   score: {
-    icon: "imgs/powerup-score.png",
+    icon: "imgs/rock.png", // Sử dụng hình ảnh có sẵn
     effect: "score"
   },
   jump: {
-    icon: "imgs/powerup-jump.png",
+    icon: "imgs/dino-run-0.png", // Sử dụng hình ảnh có sẵn
     effect: "jump"
   }
 }
