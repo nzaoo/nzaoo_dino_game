@@ -524,7 +524,7 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
-  z-index: 5;
+  z-index: 100;
 }
 
 .start-content {
@@ -534,6 +534,8 @@ body {
   box-shadow: var(--shadow);
   backdrop-filter: blur(10px);
   animation: startScreenGlow 2s ease-in-out infinite alternate;
+  z-index: 200;
+  position: relative;
 }
 
 .start-content h2 {
@@ -932,4 +934,16 @@ body {
     transform: translateX(100%);
     opacity: 0;
   }
+}
+
+.start-high-score {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--secondary-color);
+  margin-bottom: 1rem;
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+  text-align: center;
 }
