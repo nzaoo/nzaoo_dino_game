@@ -284,7 +284,6 @@ function startGame() {
   console.log('Starting game...')
   mainMenuElem.style.display = 'none'
   worldElem.classList.add('show')
-  startScreenElem.classList.remove('hide')
   isGameRunning = true
   resetGameState()
 
