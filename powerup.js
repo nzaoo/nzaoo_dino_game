@@ -21,6 +21,10 @@ const POWERUP_TYPES = {
   jump: {
     icon: "imgs/dino-run-0.png", // Sử dụng hình ảnh có sẵn
     effect: "jump"
+  },
+  fly: {
+    icon: "", // Sẽ dùng CSS, không có icon
+    effect: "fly"
   }
 }
 const worldElem = document.querySelector("[data-world]")
@@ -65,6 +69,8 @@ export function updatePowerup(delta, speedScale, onGetPowerup) {
         window.dispatchEvent(new CustomEvent("powerup:score"))
       } else if (type === "jump") {
         window.dispatchEvent(new CustomEvent("powerup:jump"))
+      } else if (type === "fly") {
+        window.dispatchEvent(new CustomEvent("powerup:fly"))
       }
     }
   })
@@ -77,10 +83,16 @@ export function getIsInvincible() {
 function createPowerup() {
   const types = Object.keys(POWERUP_TYPES)
   const type = types[Math.floor(Math.random() * types.length)]
-  const pu = document.createElement("img")
+  let pu
+  if (type === 'fly') {
+    pu = document.createElement('div')
+    pu.classList.add('powerup', 'powerup-fly')
+  } else {
+    pu = document.createElement('img')
+    pu.src = POWERUP_TYPES[type].icon
+    pu.classList.add('powerup')
+  }
   pu.dataset.powerup = type
-  pu.src = POWERUP_TYPES[type].icon
-  pu.classList.add("powerup")
   setCustomProperty(pu, "--left", 100)
   const height = POWERUP_HEIGHTS[Math.floor(Math.random() * POWERUP_HEIGHTS.length)]
   setCustomProperty(pu, "--bottom", height)

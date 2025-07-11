@@ -947,3 +947,35 @@ body {
   padding: 0;
   text-align: center;
 }
+
+.powerup-fly {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 60% 40%, #ffe066 70%, #fffbe0 100%);
+  box-shadow: 0 0 16px 4px #ffe066, 0 0 32px 8px #fffbe0;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.powerup-fly::before,
+.powerup-fly::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 10px;
+  background: #fffbe0;
+  border-radius: 50% 50% 0 0;
+  top: -8px;
+  z-index: 1;
+  opacity: 0.7;
+}
+.powerup-fly::before {
+  left: -10px;
+  transform: rotate(-20deg);
+}
+.powerup-fly::after {
+  right: -10px;
+  transform: rotate(20deg);
+}
