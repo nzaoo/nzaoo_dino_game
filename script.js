@@ -160,6 +160,8 @@ modeBtns.forEach(btn => {
   })
 })
 
+let selectedMode = localStorage.getItem('selectedMode') || 'classic';
+
 // Initialize the game
 init()
 
@@ -248,8 +250,6 @@ function setupEventListeners() {
   })
 
   const modeBtns = document.querySelectorAll('.mode-btn')
-  let selectedMode = localStorage.getItem('selectedMode') || 'classic'
-
   modeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       selectedMode = btn.dataset.mode
