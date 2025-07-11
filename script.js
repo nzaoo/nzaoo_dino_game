@@ -226,7 +226,11 @@ function setupEventListeners() {
   document.addEventListener('keydown', handleKeyPress)
   
   // Click to start
-  startScreenElem.addEventListener('click', startGame)
+  startScreenElem.addEventListener('click', startGame);
+  const startContentElem = document.querySelector('.start-content');
+  if (startContentElem) {
+    startContentElem.addEventListener('click', startGame);
+  }
 
   const characterBtns = document.querySelectorAll('.character-btn')
   let selectedCharacter = localStorage.getItem('selectedCharacter') || 'green'
