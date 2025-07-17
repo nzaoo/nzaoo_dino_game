@@ -337,6 +337,7 @@ function startGame() {
   console.log('Game started successfully')
 }
 
+// Đặt lại trạng thái game về mặc định khi bắt đầu hoặc kết thúc
 function resetGameState() {
   lastTime = null
   speedScale = 1
