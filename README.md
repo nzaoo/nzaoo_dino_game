@@ -96,3 +96,7 @@ Nếu gặp vấn đề, hãy:
 1. Kiểm tra console trong Developer Tools
 2. Đảm bảo chạy game qua HTTP server
 3. Thử mở file `test.html` để kiểm tra
+
+```
+
+```
