@@ -373,6 +373,21 @@ body.theme-ocean .mode-btn:hover {
   transform: translateY(-1px);
 }
 
+.reset-highscore-btn {
+  margin-left: 1rem;
+  background: #e67e22;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.reset-highscore-btn:hover {
+  background: #ca6f1e;
+}
+
 /* Game Over */
 .gameover-stats {
   margin-bottom: 2rem;

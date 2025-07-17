@@ -228,6 +228,17 @@ function setupEventListeners() {
   // Clear leaderboard
   document.querySelector("[data-clear-leaderboard]").addEventListener('click', clearLeaderboard)
 
+  // Reset high score
+  document.querySelector('[data-reset-highscore]').addEventListener('click', () => {
+    localStorage.removeItem('highScore');
+    highScore = 0;
+    highScoreElem.textContent = 'High Score: 0';
+    // Cập nhật high score ở các nơi khác nếu cần
+    const allHighScoreElems = document.querySelectorAll('[data-high-score], [data-final-highscore]');
+    allHighScoreElems.forEach(e => e.textContent = 'High Score: 0');
+    alert('High score has been reset!');
+  });
+
   // Keyboard events
   document.addEventListener('keydown', handleKeyPress)
   
