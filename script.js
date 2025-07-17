@@ -200,7 +200,10 @@ function hideLoadingScreen() {
 // Thiết lập các sự kiện cho nút menu, bàn phím, v.v.
 function setupEventListeners() {
   // Menu buttons
-  playBtn.addEventListener('click', startGame)
+  playBtn.addEventListener('click', () => {
+    console.log('Play button clicked');
+    startGame();
+  })
   instructionsBtn.addEventListener('click', () => showModal(instructionsModal))
   leaderboardBtn.addEventListener('click', () => showModal(leaderboardModal))
   settingsBtn.addEventListener('click', () => showModal(settingsModal))
