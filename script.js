@@ -288,6 +288,7 @@ function handleKeyPress(event) {
   }
 }
 
+// Hiển thị lại menu chính khi kết thúc hoặc tạm dừng game
 function showMainMenu() {
   mainMenuElem.style.display = 'flex'
   worldElem.classList.remove('show')
