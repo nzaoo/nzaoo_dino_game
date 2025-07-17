@@ -30,6 +30,24 @@ body {
   overflow: hidden;
 }
 
+body.theme-ocean {
+  background: linear-gradient(135deg, #3ec6e0 0%, #1b6ca8 100%);
+  color: #fff;
+}
+body.theme-ocean .menu-btn,
+body.theme-ocean .character-btn,
+body.theme-ocean .mode-btn {
+  background: #4fd3ff;
+  color: #00334e;
+  border: 1px solid #1b6ca8;
+}
+body.theme-ocean .menu-btn:hover,
+body.theme-ocean .character-btn:hover,
+body.theme-ocean .mode-btn:hover {
+  background: #1b6ca8;
+  color: #fff;
+}
+
 /* Main Menu */
 .main-menu {
   position: fixed;
