@@ -979,3 +979,12 @@ body {
   right: -10px;
   transform: rotate(20deg);
 }
+
+.menu-btn:hover,
+.character-btn:hover,
+.mode-btn:hover {
+  filter: brightness(1.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px) scale(1.04);
+  transition: all 0.15s;
+}
