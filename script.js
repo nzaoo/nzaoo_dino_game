@@ -165,6 +165,7 @@ let selectedMode = localStorage.getItem('selectedMode') || 'classic';
 // Initialize the game
 init()
 
+// Khởi tạo game, hiển thị loading, thiết lập sự kiện, load leaderboard
 function init() {
   console.log('Initializing game...')
   showLoadingScreen()
@@ -177,6 +178,7 @@ function init() {
   }, 2000)
 }
 
+// Hiển thị màn hình loading với thanh tiến trình giả lập
 function showLoadingScreen() {
   loadingScreen.style.display = 'flex'
   let progress = 0
@@ -190,10 +192,12 @@ function showLoadingScreen() {
   }, 100)
 }
 
+// Ẩn màn hình loading
 function hideLoadingScreen() {
   loadingScreen.style.display = 'none'
 }
 
+// Thiết lập các sự kiện cho nút menu, bàn phím, v.v.
 function setupEventListeners() {
   // Menu buttons
   playBtn.addEventListener('click', startGame)
