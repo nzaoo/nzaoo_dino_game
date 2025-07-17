@@ -13,7 +13,7 @@ const worldElem = document.querySelector("[data-world]")
 const scoreElem = document.querySelector("[data-score]")
 const startScreenElem = document.querySelector("[data-start-screen]")
 const highScoreElem = document.querySelector("[data-high-score]")
-const comboElem = document.querySelector('[data-combo]')
+const comboElem = document.querySelector('[data-combo]') // Hiển thị combo trên UI
 
 // Menu Elements
 const mainMenuElem = document.querySelector("[data-main-menu]")
