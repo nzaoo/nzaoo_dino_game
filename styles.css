@@ -102,6 +102,7 @@ body.theme-ocean .mode-btn:hover {
   animation: titleGlow 2s ease-in-out infinite alternate;
   position: relative;
   z-index: 1;
+  margin-bottom: 8px;
 }
 
 .menu-buttons {
