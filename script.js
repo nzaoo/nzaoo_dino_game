@@ -79,7 +79,7 @@ let score = 0
 let highScore = Number(localStorage.getItem("highScore")) || 0 // Lưu high score của người chơi
 let maxCombo = 0
 let isPaused = false // Trạng thái tạm dừng game
-let isGameRunning = false
+let isGameRunning = false // Trạng thái game đang chạy hay không
 
 // Settings
 let gameSettings = {
