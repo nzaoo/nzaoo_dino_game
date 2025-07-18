@@ -81,7 +81,7 @@ let maxCombo = 0
 let isPaused = false // Trạng thái tạm dừng game
 let isGameRunning = false // Trạng thái game đang chạy hay không
 
-// Settings
+// Cài đặt game: âm thanh, nhạc, độ khó, theme
 let gameSettings = {
   soundEnabled: true,
   musicEnabled: false,
