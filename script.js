@@ -109,7 +109,7 @@ const COMBO_BONUS = 100 // Số điểm thưởng khi đạt combo
 
 // Jump power
 let jumpPower = 1 // Sức bật nhảy hiện tại của dino
-const DEFAULT_JUMP_POWER = 1
+const DEFAULT_JUMP_POWER = 1 // Sức bật nhảy mặc định
 const BOOSTED_JUMP_POWER = 1.7
 const JUMP_BOOST_DURATION = 5000
 let jumpBoostTimeout = null
