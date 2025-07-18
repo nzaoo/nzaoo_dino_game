@@ -4,7 +4,7 @@ import { updateCactus, setupCactus, getCactusRects } from "./cactus.js"
 import { updatePowerup, setupPowerup, getIsInvincible, activateInvincibility } from "./powerup.js"
 import { updateBoss, setupBoss, getBossRect, isBossActive, getBossProjectiles } from "./boss.js"
 
-const WORLD_WIDTH = 100
+const WORLD_WIDTH = 100 // Chiều rộng thế giới game (đơn vị ảo)
 const WORLD_HEIGHT = 30
 const SPEED_SCALE_INCREASE = 0.000002 // Tốc độ tăng dần của game
 
