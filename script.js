@@ -6,7 +6,7 @@ import { updateBoss, setupBoss, getBossRect, isBossActive, getBossProjectiles } 
 
 const WORLD_WIDTH = 100
 const WORLD_HEIGHT = 30
-const SPEED_SCALE_INCREASE = 0.000002
+const SPEED_SCALE_INCREASE = 0.000002 // Tốc độ tăng dần của game
 
 // DOM Elements
 const worldElem = document.querySelector("[data-world]")
