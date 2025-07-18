@@ -78,7 +78,7 @@ const SPEED_SCALE_SMOOTH_STEP = 0.01
 let score = 0
 let highScore = Number(localStorage.getItem("highScore")) || 0 // Lưu high score của người chơi
 let maxCombo = 0
-let isPaused = false
+let isPaused = false // Trạng thái tạm dừng game
 let isGameRunning = false
 
 // Settings
