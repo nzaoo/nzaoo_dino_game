@@ -100,7 +100,7 @@ let lastSpeedBoostTime = 0
 let lastSpeedBoostScore = 0
 
 // Combo system
-let comboCount = 0
+let comboCount = 0 // Số lượng combo hiện tại
 let lastObstaclePassed = null
 let comboTimeout = null
 const COMBO_REQUIRE = 3
