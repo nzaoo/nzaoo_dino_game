@@ -112,7 +112,7 @@ let jumpPower = 1 // Sức bật nhảy hiện tại của dino
 const DEFAULT_JUMP_POWER = 1 // Sức bật nhảy mặc định
 const BOOSTED_JUMP_POWER = 1.7 // Sức bật nhảy khi nhận powerup
 const JUMP_BOOST_DURATION = 5000 // Thời gian hiệu lực powerup nhảy cao (ms)
-let jumpBoostTimeout = null
+let jumpBoostTimeout = null // Timeout cho hiệu ứng powerup nhảy cao
 window.jumpPower = jumpPower
 
 window.addEventListener("powerup:score", () => {
