@@ -52,7 +52,7 @@ const loadingScreen = document.querySelector("[data-loading-screen]")
 const loadingProgress = document.querySelector("[data-loading-progress]")
 
 // Audio
-const hitSound = new Audio("imgs/hit.wav")
+const hitSound = new Audio("imgs/hit.wav") // Âm thanh khi va chạm chướng ngại vật
 let backgroundMusic = null
 let isMuted = false
 
