@@ -63,7 +63,7 @@ const soundPowerupJump = new Audio('imgs/powerup-jump.wav')
 const soundModeChange = new Audio('imgs/mode-change.wav')
 
 // Xử lý lỗi audio
-const audioElements = [hitSound, soundPowerupInv, soundPowerupScore, soundPowerupJump, soundModeChange]
+const audioElements = [hitSound, soundPowerupInv, soundPowerupScore, soundPowerupJump, soundModeChange] // Danh sách các audio để kiểm tra lỗi
 audioElements.forEach(audio => {
   audio.addEventListener('error', () => {
     console.log('Audio file not found, continuing without sound')
