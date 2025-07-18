@@ -80,6 +80,7 @@ let highScore = Number(localStorage.getItem("highScore")) || 0 // Lưu high scor
 let maxCombo = 0 // Combo lớn nhất đạt được trong game
 let isPaused = false // Trạng thái tạm dừng game
 let isGameRunning = false // Trạng thái game đang chạy hay không
+let bossPause = false // Trạng thái tạm dừng khi boss xuất hiện
 
 // Cài đặt game: âm thanh, nhạc, độ khó, theme
 let gameSettings = {
@@ -105,7 +106,6 @@ let lastObstaclePassed = null // Chướng ngại vật cuối cùng đã vượ
 let comboTimeout = null // Timeout để reset combo
 const COMBO_REQUIRE = 3 // Số chướng ngại vật cần để được combo
 const COMBO_BONUS = 100 // Số điểm thưởng khi đạt combo
-let bossPause = false
 
 // Jump power
 let jumpPower = 1 // mặc định
