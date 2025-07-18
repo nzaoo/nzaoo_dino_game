@@ -77,7 +77,7 @@ let speedScaleTarget = 1
 const SPEED_SCALE_SMOOTH_STEP = 0.01 // Bước tăng mượt cho tốc độ game
 let score = 0 // Điểm số hiện tại của người chơi
 let highScore = Number(localStorage.getItem("highScore")) || 0 // Lưu high score của người chơi
-let maxCombo = 0
+let maxCombo = 0 // Combo lớn nhất đạt được trong game
 let isPaused = false // Trạng thái tạm dừng game
 let isGameRunning = false // Trạng thái game đang chạy hay không
 
