@@ -103,7 +103,7 @@ let lastSpeedBoostScore = 0
 let comboCount = 0 // Số lượng combo hiện tại
 let lastObstaclePassed = null // Chướng ngại vật cuối cùng đã vượt qua
 let comboTimeout = null // Timeout để reset combo
-const COMBO_REQUIRE = 3
+const COMBO_REQUIRE = 3 // Số chướng ngại vật cần để được combo
 const COMBO_BONUS = 100
 let bossPause = false
 
