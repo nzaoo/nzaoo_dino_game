@@ -57,7 +57,7 @@ let backgroundMusic = null // Nhạc nền của game
 let isMuted = false // Trạng thái tắt/bật âm thanh
 
 // Âm thanh vật phẩm - thêm xử lý lỗi
-const soundPowerupInv = new Audio('imgs/powerup-inv.wav')
+const soundPowerupInv = new Audio('imgs/powerup-inv.wav') // Âm thanh powerup bất tử
 const soundPowerupScore = new Audio('imgs/powerup-score.wav')
 const soundPowerupJump = new Audio('imgs/powerup-jump.wav')
 const soundModeChange = new Audio('imgs/mode-change.wav')
