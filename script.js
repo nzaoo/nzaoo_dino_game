@@ -59,7 +59,7 @@ let isMuted = false // Trạng thái tắt/bật âm thanh
 // Âm thanh vật phẩm - thêm xử lý lỗi
 const soundPowerupInv = new Audio('imgs/powerup-inv.wav') // Âm thanh powerup bất tử
 const soundPowerupScore = new Audio('imgs/powerup-score.wav') // Âm thanh powerup điểm số
-const soundPowerupJump = new Audio('imgs/powerup-jump.wav')
+const soundPowerupJump = new Audio('imgs/powerup-jump.wav') // Âm thanh powerup nhảy cao
 const soundModeChange = new Audio('imgs/mode-change.wav')
 
 // Xử lý lỗi audio
