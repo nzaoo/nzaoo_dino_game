@@ -54,7 +54,7 @@ const loadingProgress = document.querySelector("[data-loading-progress]")
 // Audio
 const hitSound = new Audio("imgs/hit.wav") // Âm thanh khi va chạm chướng ngại vật
 let backgroundMusic = null // Nhạc nền của game
-let isMuted = false
+let isMuted = false // Trạng thái tắt/bật âm thanh
 
 // Âm thanh vật phẩm - thêm xử lý lỗi
 const soundPowerupInv = new Audio('imgs/powerup-inv.wav')
