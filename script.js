@@ -212,7 +212,10 @@ function setupEventListeners() {
     console.log('Leaderboard button clicked');
     showModal(leaderboardModal);
   })
-  settingsBtn.addEventListener('click', () => showModal(settingsModal))
+  settingsBtn.addEventListener('click', () => {
+    console.log('Settings button clicked');
+    showModal(settingsModal);
+  })
 
   // Close buttons
   document.querySelector("[data-close-instructions]").addEventListener('click', () => hideModal(instructionsModal))
