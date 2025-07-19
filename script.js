@@ -71,7 +71,7 @@ audioElements.forEach(audio => {
 })
 
 // Game State
-let lastTime
+let lastTime // Thời gian frame cuối cùng
 let speedScale = 1
 let speedScaleTarget = 1
 const SPEED_SCALE_SMOOTH_STEP = 0.01 // Bước tăng mượt cho tốc độ game
