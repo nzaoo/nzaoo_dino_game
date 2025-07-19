@@ -160,7 +160,7 @@ modeBtns.forEach(btn => {
   })
 })
 
-let selectedMode = localStorage.getItem('selectedMode') || 'classic';
+let selectedMode = localStorage.getItem('selectedMode') || 'classic'; // Chế độ chơi được chọn
 
 // Initialize the game
 init()
