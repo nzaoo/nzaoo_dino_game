@@ -301,6 +301,17 @@ function handleKeyPress(event) {
   }
 }
 
+// Xử lý sự kiện chạm màn hình
+function handleTouchStart(event) {
+  if (event.code === 'Space' && !isGameRunning) {
+    event.preventDefault()
+    startGame()
+  } else if (event.code === 'Escape' && isGameRunning) {
+    event.preventDefault()
+    togglePause()
+  }
+}
+
 // Hiển thị lại menu chính khi kết thúc hoặc tạm dừng game
 function showMainMenu() {
   mainMenuElem.style.display = 'flex'
