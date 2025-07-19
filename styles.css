@@ -541,6 +541,7 @@ body.theme-ocean .mode-btn:hover {
   border-radius: var(--border-radius);
   backdrop-filter: blur(10px);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 4px;
 }
 
 .combo {
