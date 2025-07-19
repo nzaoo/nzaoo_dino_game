@@ -552,6 +552,7 @@ body.theme-ocean .mode-btn:hover {
   z-index: 3;
   pointer-events: none;
   animation: comboPulse 0.5s ease;
+  margin-bottom: 4px;
 }
 
 .start-screen {
