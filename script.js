@@ -290,6 +290,7 @@ function setupEventListeners() {
   })
 }
 
+// Xử lý sự kiện bàn phím
 function handleKeyPress(event) {
   if (event.code === 'Space' && !isGameRunning) {
     event.preventDefault()
