@@ -204,7 +204,10 @@ function setupEventListeners() {
     console.log('Play button clicked');
     startGame();
   })
-  instructionsBtn.addEventListener('click', () => showModal(instructionsModal))
+  instructionsBtn.addEventListener('click', () => {
+    console.log('Instructions button clicked');
+    showModal(instructionsModal);
+  })
   leaderboardBtn.addEventListener('click', () => showModal(leaderboardModal))
   settingsBtn.addEventListener('click', () => showModal(settingsModal))
 
