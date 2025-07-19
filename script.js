@@ -208,7 +208,10 @@ function setupEventListeners() {
     console.log('Instructions button clicked');
     showModal(instructionsModal);
   })
-  leaderboardBtn.addEventListener('click', () => showModal(leaderboardModal))
+  leaderboardBtn.addEventListener('click', () => {
+    console.log('Leaderboard button clicked');
+    showModal(leaderboardModal);
+  })
   settingsBtn.addEventListener('click', () => showModal(settingsModal))
 
   // Close buttons
