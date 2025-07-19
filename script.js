@@ -94,7 +94,7 @@ let gameSettings = {
 loadSettings()
 
 // Speed boost variables
-const SPEED_BOOST_INTERVAL_MS = 30000
+const SPEED_BOOST_INTERVAL_MS = 30000 // Khoảng thời gian tăng tốc (30 giây)
 const SPEED_BOOST_SCORE = 500
 const SPEED_BOOST_AMOUNT = 0.05
 let lastSpeedBoostTime = 0 // Thời gian tăng tốc cuối cùng
