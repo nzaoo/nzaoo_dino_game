@@ -97,7 +97,7 @@ loadSettings()
 const SPEED_BOOST_INTERVAL_MS = 30000
 const SPEED_BOOST_SCORE = 500
 const SPEED_BOOST_AMOUNT = 0.05
-let lastSpeedBoostTime = 0
+let lastSpeedBoostTime = 0 // Thời gian tăng tốc cuối cùng
 let lastSpeedBoostScore = 0
 
 // Combo system
