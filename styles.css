@@ -68,6 +68,7 @@ body.theme-ocean .mode-btn:hover {
   background: var(--menu-bg);
   padding: 3rem;
   padding-left: 8px;
+  padding-right: 8px;
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
   backdrop-filter: blur(10px);
