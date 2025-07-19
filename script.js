@@ -320,6 +320,7 @@ function showMainMenu() {
   resetGameState()
 }
 
+// Bắt đầu trò chơi
 function startGame() {
   console.log('Starting game...')
   mainMenuElem.style.display = 'none'
