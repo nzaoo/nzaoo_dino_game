@@ -398,6 +398,7 @@ function togglePause() {
   }
 }
 
+// Khởi động lại game sau khi thua hoặc từ menu tạm dừng
 function restartGame() {
   hideModal(gameoverModal)
   startGame()
