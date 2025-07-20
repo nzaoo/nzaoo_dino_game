@@ -511,6 +511,7 @@ function addToLeaderboard(score) {
   loadLeaderboard()
 }
 
+// Xóa toàn bộ bảng xếp hạng khỏi localStorage
 function clearLeaderboard() {
   localStorage.removeItem('leaderboard')
   loadLeaderboard()
