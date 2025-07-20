@@ -426,6 +426,7 @@ function showGameOver() {
   showModal(gameoverModal)
 }
 
+// Cập nhật cài đặt game khi người dùng thay đổi
 function updateSettings() {
   gameSettings.soundEnabled = soundToggle.checked
   gameSettings.musicEnabled = musicToggle.checked
