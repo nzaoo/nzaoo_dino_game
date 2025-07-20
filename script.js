@@ -590,6 +590,7 @@ function shrinkRect(rect, amount) {
   }
 }
 
+// Cập nhật tốc độ game dựa trên thời gian và chế độ chơi
 function updateSpeedScale(delta) {
   if (window.isEndlessMode) {
     speedScale = 1
