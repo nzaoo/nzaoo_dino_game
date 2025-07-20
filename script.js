@@ -414,6 +414,7 @@ function hideModal(modal) {
   modal.classList.remove('show')
 }
 
+// Hiển thị màn hình Game Over và cập nhật thống kê
 function showGameOver() {
   finalScoreElem.textContent = Math.floor(score)
   finalHighscoreElem.textContent = highScore
