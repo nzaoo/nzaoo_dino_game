@@ -409,6 +409,7 @@ function showModal(modal) {
   modal.classList.add('show')
 }
 
+// Ẩn modal (hộp thoại) truyền vào
 function hideModal(modal) {
   modal.classList.remove('show')
 }
