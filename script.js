@@ -471,6 +471,7 @@ function startBackgroundMusic() {
   console.log('Background music started')
 }
 
+// Dừng phát nhạc nền
 function stopBackgroundMusic() {
   // Placeholder for stopping background music
   console.log('Background music stopped')
