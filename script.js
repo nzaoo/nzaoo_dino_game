@@ -495,6 +495,7 @@ function loadLeaderboard() {
   })
 }
 
+// Thêm điểm số mới vào bảng xếp hạng và lưu vào localStorage
 function addToLeaderboard(score) {
   const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]')
   leaderboard.push({
