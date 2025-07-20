@@ -477,6 +477,7 @@ function stopBackgroundMusic() {
   console.log('Background music stopped')
 }
 
+// Tải bảng xếp hạng từ localStorage và hiển thị
 function loadLeaderboard() {
   const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]')
   const leaderboardList = document.querySelector("[data-leaderboard-list]")
