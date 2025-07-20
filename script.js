@@ -464,6 +464,7 @@ function loadSettings() {
   }
 }
 
+// Bắt đầu phát nhạc nền nếu được bật
 function startBackgroundMusic() {
   // Placeholder for background music
   // In a real implementation, you would load and play background music here
