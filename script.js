@@ -612,6 +612,7 @@ function updateSpeedScale(delta) {
   }
 }
 
+// Cập nhật điểm số của người chơi mỗi frame
 function updateScore(delta) {
   score += delta * 0.01
   scoreElem.textContent = Math.floor(score)
