@@ -558,6 +558,7 @@ function update(time) {
   window.requestAnimationFrame(update)
 }
 
+// Kiểm tra điều kiện thua game
 function checkLose() {
   const dinoRect = shrinkRect(getDinoRect(), 5)
   if (getIsInvincible()) return false
