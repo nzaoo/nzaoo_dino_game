@@ -447,6 +447,7 @@ function updateSettings() {
   localStorage.setItem('gameSettings', JSON.stringify(gameSettings))
 }
 
+// Tải cài đặt game từ localStorage khi khởi động
 function loadSettings() {
   const saved = localStorage.getItem('gameSettings')
   if (saved) {
