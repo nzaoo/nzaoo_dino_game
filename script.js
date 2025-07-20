@@ -570,6 +570,7 @@ function checkLose() {
   )
 }
 
+// Kiểm tra va chạm giữa hai hình chữ nhật
 function isCollision(rect1, rect2) {
   return (
     rect1.left < rect2.right &&
