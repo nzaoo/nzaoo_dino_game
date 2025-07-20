@@ -404,6 +404,7 @@ function restartGame() {
   startGame()
 }
 
+// Hiển thị modal (hộp thoại) truyền vào
 function showModal(modal) {
   modal.classList.add('show')
 }
