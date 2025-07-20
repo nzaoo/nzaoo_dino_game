@@ -386,6 +386,7 @@ function resetGameState() {
   document.querySelector('[data-dino]').style.filter = ''
 }
 
+// Chuyển đổi trạng thái tạm dừng game
 function togglePause() {
   if (!isGameRunning) return
   
