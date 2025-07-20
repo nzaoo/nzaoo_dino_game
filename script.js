@@ -580,6 +580,7 @@ function isCollision(rect1, rect2) {
   )
 }
 
+// Thu nhỏ hình chữ nhật theo một lượng nhất định
 function shrinkRect(rect, amount) {
   return {
     left: rect.left + amount,
