@@ -520,6 +520,7 @@ function clearLeaderboard() {
 setPixelToWorldScale()
 window.addEventListener("resize", setPixelToWorldScale)
 
+// Vòng lặp chính cập nhật trạng thái game mỗi frame
 function update(time) {
   if (lastTime == null) {
     lastTime = time
