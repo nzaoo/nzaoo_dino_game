@@ -16,6 +16,7 @@ const PROJECTILE_SPEED = 0.18
 const PROJECTILE_INTERVAL = 1200 // ms
 let projectileIntervalId = null
 
+// Thiết lập lại trạng thái boss khi bắt đầu game hoặc sau khi boss biến mất
 export function setupBoss() {
   removeBoss()
   bossActive = false
