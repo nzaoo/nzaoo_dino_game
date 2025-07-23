@@ -56,6 +56,7 @@ export function setDinoLose() {
   dinoElem.src = "imgs/dino-lose.png"
 }
 
+// Xử lý hoạt ảnh chạy của dino
 function handleRun(delta, speedScale) {
   if (isJumping) {
     dinoElem.src = `imgs/dino-stationary.png`
