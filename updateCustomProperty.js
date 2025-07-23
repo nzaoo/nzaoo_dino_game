@@ -1,12 +1,16 @@
+// Lấy giá trị custom property từ phần tử DOM
 export function getCustomProperty(elem, prop) {
+  // Lấy giá trị custom property, trả về 0 nếu không hợp lệ
   return parseFloat(getComputedStyle(elem).getPropertyValue(prop)) || 0
 }
 
 export function setCustomProperty(elem, prop, value) {
+  // Đặt giá trị custom property
   elem.style.setProperty(prop, value)
 }
 
 export function incrementCustomProperty(elem, prop, inc) {
+  // Tăng giá trị custom property lên một lượng inc
   setCustomProperty(elem, prop, getCustomProperty(elem, prop) + inc)
 }
 
