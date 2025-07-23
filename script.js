@@ -316,7 +316,7 @@ function handleKeyPress(event) {
   }
 }
 
-// Xử lý sự kiện chạm màn hình
+// Xử lý sự kiện chạm màn hình (dành cho thiết bị cảm ứng)
 function handleTouchStart(event) {
   if (event.code === 'Space' && !isGameRunning) {
     event.preventDefault()
