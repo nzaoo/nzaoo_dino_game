@@ -19,6 +19,7 @@ export function setupCactus() {
   })
 }
 
+// Cập nhật vị trí và sinh mới chướng ngại vật (cactus) theo thời gian
 export function updateCactus(delta, speedScale) {
   document.querySelectorAll("[data-cactus]").forEach(cactus => {
     incrementCustomProperty(cactus, "--left", delta * speedScale * SPEED * -1)
