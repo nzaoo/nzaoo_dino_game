@@ -4,6 +4,7 @@ export function getCustomProperty(elem, prop) {
   return parseFloat(getComputedStyle(elem).getPropertyValue(prop)) || 0
 }
 
+// Đặt giá trị custom property cho phần tử DOM
 export function setCustomProperty(elem, prop, value) {
   // Đặt giá trị custom property
   elem.style.setProperty(prop, value)
