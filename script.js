@@ -4,7 +4,9 @@ import { updateCactus, setupCactus, getCactusRects } from "./cactus.js"
 import { updatePowerup, setupPowerup, getIsInvincible, activateInvincibility } from "./powerup.js"
 import { updateBoss, setupBoss, getBossRect, isBossActive, getBossProjectiles } from "./boss.js"
 
+// Định nghĩa chiều rộng thế giới game (đơn vị ảo)
 const WORLD_WIDTH = 100 // Chiều rộng thế giới game (đơn vị ảo)
+// Định nghĩa chiều cao thế giới game (đơn vị ảo)
 const WORLD_HEIGHT = 30 // Chiều cao thế giới game (đơn vị ảo)
 const SPEED_SCALE_INCREASE = 0.000002 // Tốc độ tăng dần của game
 
@@ -53,13 +55,16 @@ const loadingProgress = document.querySelector("[data-loading-progress]")
 
 // Audio
 const hitSound = new Audio("imgs/hit.wav") // Âm thanh khi va chạm chướng ngại vật
+// Biến lưu nhạc nền của game
 let backgroundMusic = null // Nhạc nền của game
 let isMuted = false // Trạng thái tắt/bật âm thanh
 
-// Âm thanh vật phẩm - thêm xử lý lỗi
+// Âm thanh vật phẩm
 const soundPowerupInv = new Audio('imgs/powerup-inv.wav') // Âm thanh powerup bất tử
+// Âm thanh khi nhận powerup điểm số
 const soundPowerupScore = new Audio('imgs/powerup-score.wav') // Âm thanh powerup điểm số
 const soundPowerupJump = new Audio('imgs/powerup-jump.wav') // Âm thanh powerup nhảy cao
+// Âm thanh khi đổi chế độ chơi
 const soundModeChange = new Audio('imgs/mode-change.wav') // Âm thanh khi đổi chế độ chơi
 
 // Xử lý lỗi audio
@@ -82,7 +87,7 @@ let isPaused = false // Trạng thái tạm dừng game
 let isGameRunning = false // Trạng thái game đang chạy hay không
 let bossPause = false // Trạng thái tạm dừng khi boss xuất hiện
 
-// Cài đặt game: âm thanh, nhạc, độ khó, theme
+// Đối tượng lưu trữ cài đặt game: âm thanh, nhạc, độ khó, theme
 let gameSettings = {
   soundEnabled: true,
   musicEnabled: false,
@@ -110,12 +115,13 @@ const COMBO_BONUS = 100 // Số điểm thưởng khi đạt combo
 // Jump power
 let jumpPower = 1 // Sức bật nhảy hiện tại của dino
 const DEFAULT_JUMP_POWER = 1 // Sức bật nhảy mặc định
-const BOOSTED_JUMP_POWER = 1.7 // Sức bật nhảy khi nhận powerup
+const BOOSTED_JUMP_POWER = 1.7 // Sức bật nhảy khi nhận power-up
 const JUMP_BOOST_DURATION = 5000 // Thời gian hiệu lực powerup nhảy cao (ms)
 let jumpBoostTimeout = null // Timeout cho hiệu ứng powerup nhảy cao
 window.jumpPower = jumpPower
 
 window.addEventListener("powerup:score", () => {
+  // Nhận powerup điểm số, cộng thêm 200 điểm
   score += 200
   scoreElem.textContent = Math.floor(score)
   try {
@@ -126,6 +132,7 @@ window.addEventListener("powerup:score", () => {
 })
 
 window.addEventListener("powerup:jump", () => {
+  // Nhận powerup nhảy cao
   jumpPower = BOOSTED_JUMP_POWER
   window.jumpPower = jumpPower
   if (jumpBoostTimeout) clearTimeout(jumpBoostTimeout)
@@ -141,6 +148,7 @@ window.addEventListener("powerup:jump", () => {
 })
 
 window.addEventListener("powerup:invincibility", () => {
+  // Nhận powerup bất tử
   try {
     soundPowerupInv.currentTime = 0; soundPowerupInv.play()
   } catch (e) {
@@ -167,6 +175,7 @@ init()
 
 // Khởi tạo game, hiển thị loading, thiết lập sự kiện, load leaderboard
 function init() {
+  // Bắt đầu khởi tạo game
   console.log('Initializing game...')
   showLoadingScreen()
   setupEventListeners()
@@ -180,6 +189,7 @@ function init() {
 
 // Hiển thị màn hình loading với thanh tiến trình giả lập
 function showLoadingScreen() {
+  // Hiển thị loading screen
   loadingScreen.style.display = 'flex'
   let progress = 0
   const interval = setInterval(() => {
@@ -194,12 +204,13 @@ function showLoadingScreen() {
 
 // Ẩn màn hình loading
 function hideLoadingScreen() {
+  // Ẩn loading screen
   loadingScreen.style.display = 'none'
 }
 
 // Thiết lập các sự kiện cho nút menu, bàn phím, v.v.
 function setupEventListeners() {
-  // Menu buttons
+  // Thiết lập sự kiện cho các nút menu
   playBtn.addEventListener('click', () => {
     console.log('Play button clicked');
     startGame();
@@ -228,10 +239,12 @@ function setupEventListeners() {
   pauseMainMenuBtn.addEventListener('click', showMainMenu)
 
   // Pause buttons
+  // Thiết lập sự kiện cho nút tạm dừng và tiếp tục
   pauseBtn.addEventListener('click', togglePause)
   resumeBtn.addEventListener('click', togglePause)
 
   // Settings
+  // Thiết lập sự kiện cho các tuỳ chọn cài đặt
   soundToggle.addEventListener('change', updateSettings)
   musicToggle.addEventListener('change', updateSettings)
   difficultySelect.addEventListener('change', updateSettings)
@@ -265,6 +278,7 @@ function setupEventListeners() {
   let selectedCharacter = localStorage.getItem('selectedCharacter') || 'green'
 
   characterBtns.forEach(btn => {
+    // Sự kiện chọn nhân vật
     btn.addEventListener('click', () => {
       selectedCharacter = btn.dataset.character
       localStorage.setItem('selectedCharacter', selectedCharacter)
@@ -278,6 +292,7 @@ function setupEventListeners() {
 
   const modeBtns = document.querySelectorAll('.mode-btn')
   modeBtns.forEach(btn => {
+    // Sự kiện chọn chế độ chơi
     btn.addEventListener('click', () => {
       selectedMode = btn.dataset.mode
       localStorage.setItem('selectedMode', selectedMode)
@@ -314,6 +329,7 @@ function handleTouchStart(event) {
 
 // Hiển thị lại menu chính khi kết thúc hoặc tạm dừng game
 function showMainMenu() {
+  // Hiển thị lại menu chính khi kết thúc hoặc tạm dừng game
   mainMenuElem.style.display = 'flex'
   worldElem.classList.remove('show')
   isGameRunning = false
@@ -322,6 +338,7 @@ function showMainMenu() {
 
 // Bắt đầu trò chơi
 function startGame() {
+  // Bắt đầu trò chơi
   console.log('Starting game...')
   mainMenuElem.style.display = 'none'
   worldElem.classList.add('show')
@@ -361,6 +378,7 @@ function startGame() {
 
 // Đặt lại trạng thái game về mặc định khi bắt đầu hoặc kết thúc
 function resetGameState() {
+  // Đặt lại các biến trạng thái game về mặc định
   lastTime = null
   speedScale = 1
   speedScaleTarget = 1
@@ -376,7 +394,7 @@ function resetGameState() {
   comboElem.textContent = ''
   pauseMenu.classList.remove('show')
   
-  // Setup game elements
+  // Thiết lập lại các thành phần game
   setupGround()
   setupDino()
   setupCactus()
@@ -388,6 +406,7 @@ function resetGameState() {
 
 // Chuyển đổi trạng thái tạm dừng game
 function togglePause() {
+  // Chuyển đổi trạng thái tạm dừng game
   if (!isGameRunning) return
   
   isPaused = !isPaused
@@ -400,6 +419,7 @@ function togglePause() {
 
 // Khởi động lại game sau khi thua hoặc từ menu tạm dừng
 function restartGame() {
+  // Khởi động lại game sau khi thua hoặc từ menu tạm dừng
   hideModal(gameoverModal)
   startGame()
 }
