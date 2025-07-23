@@ -71,6 +71,7 @@ function handleRun(delta, speedScale) {
   currentFrameTime += delta * speedScale
 }
 
+// Xử lý logic nhảy của dino
 function handleJump(delta) {
   if (!isJumping) return
   if (dinoFrame === 0) {
