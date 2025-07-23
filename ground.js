@@ -13,6 +13,7 @@ export function setupGround() {
   setCustomProperty(groundElems[1], "--left", 300)
 }
 
+// Cập nhật vị trí các phần nền, tạo hiệu ứng chuyển động lặp vô hạn
 export function updateGround(delta, speedScale) {
   groundElems.forEach(ground => {
     incrementCustomProperty(ground, "--left", delta * speedScale * SPEED * -1)
