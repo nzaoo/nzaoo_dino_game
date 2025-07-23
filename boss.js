@@ -25,6 +25,7 @@ export function setupBoss() {
   if (projectileIntervalId) clearInterval(projectileIntervalId)
 }
 
+// Cập nhật trạng thái boss, di chuyển boss và xử lý đạn của boss
 export function updateBoss(delta, score, onBossStart, onBossEnd) {
   if (!bossActive && Math.floor(score) > 0 && Math.floor(score) % BOSS_INTERVAL_SCORE === 0) {
     spawnBoss()
