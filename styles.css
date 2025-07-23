@@ -948,7 +948,7 @@ body.theme-ocean .mode-btn:hover {
   color: white;
   padding: 1rem 1.5rem;
   border-radius: var(--border-radius);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow); /* Hiệu ứng bóng cho popup thành tích */
   z-index: 1000;
   animation: achievementSlideIn 0.5s ease,
     achievementSlideOut 0.5s ease 2.5s forwards;
