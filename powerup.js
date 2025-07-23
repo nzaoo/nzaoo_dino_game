@@ -33,6 +33,7 @@ let nextPowerupTime
 let isInvincible = false
 let invincibleTimeout = null
 
+// Thiết lập lại trạng thái powerup khi bắt đầu game
 export function setupPowerup() {
   nextPowerupTime = POWERUP_INTERVAL_MIN
   isInvincible = false
