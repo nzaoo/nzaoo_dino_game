@@ -41,6 +41,7 @@ export function setupPowerup() {
   document.querySelectorAll("[data-powerup]").forEach(pu => pu.remove())
 }
 
+// Cập nhật vị trí, sinh mới và xử lý va chạm powerup
 export function updatePowerup(delta, speedScale, onGetPowerup) {
   document.querySelectorAll("[data-powerup]").forEach(pu => {
     incrementCustomProperty(pu, "--left", delta * speedScale * SPEED * -1)
