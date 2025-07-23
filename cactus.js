@@ -11,6 +11,7 @@ const CACTUS_INTERVAL_MAX = 2200
 const worldElem = document.querySelector("[data-world]")
 
 let nextCactusTime
+// Thiết lập lại trạng thái chướng ngại vật (cactus) khi bắt đầu game
 export function setupCactus() {
   nextCactusTime = CACTUS_INTERVAL_MIN
   document.querySelectorAll("[data-cactus]").forEach(cactus => {
