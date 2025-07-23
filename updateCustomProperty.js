@@ -10,6 +10,7 @@ export function setCustomProperty(elem, prop, value) {
   elem.style.setProperty(prop, value)
 }
 
+// Tăng giá trị custom property cho phần tử DOM lên một lượng nhất định
 export function incrementCustomProperty(elem, prop, inc) {
   // Tăng giá trị custom property lên một lượng inc
   setCustomProperty(elem, prop, getCustomProperty(elem, prop) + inc)
