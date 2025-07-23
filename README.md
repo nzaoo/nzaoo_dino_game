@@ -32,7 +32,7 @@ http-server
 - **Nhảy**: Nhấn phím SPACE hoặc click chuột
 - **Tạm dừng**: Nhấn phím ESC
 - **Mục tiêu**: Tránh các chướng ngại vật (cây xương rồng, đá)
-- **Thu thập**: Các powerup để tăng điểm và khả năng đặc biệt
+- **Thu thập**: Các power-up để tăng điểm và khả năng đặc biệt
 
 ## Khắc phục sự cố
 
@@ -61,7 +61,7 @@ nzaoo_dino_game/
 ├── dino.js             # Xử lý nhân vật khủng long
 ├── cactus.js           # Xử lý chướng ngại vật
 ├── ground.js           # Xử lý mặt đất
-├── powerup.js          # Xử lý powerup
+├── powerup.js           # Xử lý power-up
 ├── boss.js             # Xử lý boss
 ├── updateCustomProperty.js # Utility functions
 ├── styles.css          # CSS styles
@@ -82,7 +82,7 @@ nzaoo_dino_game/
 - ✅ Menu chính với nhiều tùy chọn
 - ✅ 3 chế độ chơi: Hard, Endless, Time Attack
 - ✅ Hệ thống combo và điểm số
-- ✅ Powerup system
+- ✅ Power-up system
 - ✅ Boss battles
 - ✅ Leaderboard
 - ✅ Settings và themes
