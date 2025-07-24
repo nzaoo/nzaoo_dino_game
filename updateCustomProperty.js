@@ -40,3 +40,5 @@ export function isObstacleTooCloseByLeft(newLeft, minDistance) {
     return Math.abs(obsRect.left - newLeft) < minDistance
   })
 }
+
+// Commit 20: Thêm comment nhỏ ở cuối file
