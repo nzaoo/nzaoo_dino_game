@@ -1,4 +1,4 @@
-<!-- Commit 1: Thêm comment nhỏ để tăng số lượng commit -->
+<!-- Commit 21: Thêm comment nhỏ tiếp tục tăng số lượng commit -->
 
 # Dino Runner Game
 
