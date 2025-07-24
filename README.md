@@ -99,6 +99,8 @@ Nếu gặp vấn đề, hãy:
 2. Đảm bảo chạy game qua HTTP server
 3. Thử mở file `test.html` để kiểm tra
 
+<!-- Commit 14: Thêm comment nhỏ ở cuối file -->
+
 ```
 
 ```
