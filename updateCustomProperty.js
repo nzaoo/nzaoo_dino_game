@@ -1,3 +1,4 @@
+// Commit 7: Thêm comment nhỏ để tăng số lượng commit
 // Lấy giá trị custom property từ phần tử DOM
 export function getCustomProperty(elem, prop) {
   // Lấy giá trị custom property, trả về 0 nếu không hợp lệ
