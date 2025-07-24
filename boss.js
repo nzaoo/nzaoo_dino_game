@@ -109,3 +109,4 @@ function clearProjectiles() {
   projectiles.forEach(p => p.remove())
   projectiles = []
 } 
+// Commit 15: Thêm comment nhỏ ở cuối file 

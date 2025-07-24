@@ -24,3 +24,5 @@ export function updateGround(delta, speedScale) {
     }
   })
 }
+
+// Commit 17: Thêm comment nhỏ ở cuối file

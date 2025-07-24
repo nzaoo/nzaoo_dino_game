@@ -112,3 +112,5 @@ function onJumpRelease(e) {
   if (e.code !== "Space") return
   isHoldingJump = false
 }
+
+// Commit 18: Thêm comment nhỏ ở cuối file
