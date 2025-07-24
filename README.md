@@ -1,3 +1,5 @@
+<!-- Commit 1: Thêm comment nhỏ để tăng số lượng commit -->
+
 # Dino Runner Game
 
 Một game chạy nhảy đơn giản với nhân vật khủng long, được viết bằng HTML, CSS và JavaScript.

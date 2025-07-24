@@ -1,3 +1,4 @@
+// Commit 5: Thêm comment nhỏ để tăng số lượng commit
 import {
   incrementCustomProperty,
   setCustomProperty,
