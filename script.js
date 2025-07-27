@@ -716,6 +716,7 @@ function handleStart() {
 }
 
 function handleLose() {
+  // Phát âm thanh khi thua nếu được bật
   if (gameSettings.soundEnabled && !isMuted) {
     try {
       hitSound.currentTime = 0
