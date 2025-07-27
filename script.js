@@ -686,6 +686,7 @@ function updateCombo() {
 }
 
 function showComboEffect(count) {
+  // Hiển thị hiệu ứng combo và thông báo điểm thưởng
   comboElem.textContent = `COMBO x${count}! +${COMBO_BONUS}`
   if (comboTimeout) clearTimeout(comboTimeout)
   comboTimeout = setTimeout(() => {
