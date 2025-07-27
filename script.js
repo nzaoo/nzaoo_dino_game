@@ -308,6 +308,7 @@ function setupEventListeners() {
 
 // Xử lý sự kiện bàn phím
 function handleKeyPress(event) {
+  // Xử lý phím Space để bắt đầu game
   if (event.code === 'Space' && !isGameRunning) {
     event.preventDefault()
     startGame()
