@@ -190,7 +190,7 @@ function init() {
 
 // Hiển thị màn hình loading với thanh tiến trình giả lập
 function showLoadingScreen() {
-  // Hiển thị loading screen
+  // Hiển thị loading screen (commit 28)
   loadingScreen.style.display = 'flex'
   let progress = 0
   const interval = setInterval(() => {
@@ -205,13 +205,13 @@ function showLoadingScreen() {
 
 // Ẩn màn hình loading
 function hideLoadingScreen() {
-  // Ẩn loading screen
+  // Ẩn loading screen (commit 29)
   loadingScreen.style.display = 'none'
 }
 
 // Thiết lập các sự kiện cho nút menu, bàn phím, v.v.
 function setupEventListeners() {
-  // Thiết lập sự kiện cho các nút menu
+  // Thiết lập sự kiện cho các nút menu (commit 30)
   playBtn.addEventListener('click', () => {
     console.log('Play button clicked');
     startGame();
