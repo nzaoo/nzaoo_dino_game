@@ -733,6 +733,7 @@ function handleLose() {
 }
 
 function setPixelToWorldScale() {
+  // Tính toán tỷ lệ để hiển thị game phù hợp với kích thước màn hình
   let worldToPixelScale
   if (window.innerWidth / window.innerHeight < WORLD_WIDTH / WORLD_HEIGHT) {
     worldToPixelScale = window.innerWidth / WORLD_WIDTH
