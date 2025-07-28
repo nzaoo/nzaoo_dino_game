@@ -265,10 +265,10 @@ function setupEventListeners() {
     alert('High score has been reset!');
   });
 
-  // Keyboard events
+  // Thêm sự kiện bàn phím để điều khiển game
   document.addEventListener('keydown', handleKeyPress)
   
-  // Click to start
+  // Thêm sự kiện click để bắt đầu game
   startScreenElem.addEventListener('click', startGame);
   const startContentElem = document.querySelector('.start-content');
   if (startContentElem) {
