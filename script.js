@@ -646,6 +646,7 @@ function updateScore(delta) {
 }
 
 function checkSpeedBoost(time) {
+  // Kiểm tra và tăng tốc độ game theo thời gian và điểm số
   if (time - lastSpeedBoostTime > SPEED_BOOST_INTERVAL_MS) {
     speedScaleTarget += SPEED_BOOST_AMOUNT
     lastSpeedBoostTime = time
