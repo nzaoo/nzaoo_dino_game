@@ -306,36 +306,37 @@ function setupEventListeners() {
   })
 }
 
-// Xử lý sự kiện bàn phím
+// Xử lý sự kiện bàn phím cho các phím điều khiển game
 function handleKeyPress(event) {
-  // Xử lý phím Space để bắt đầu game
+  // Xử lý phím Space để bắt đầu game khi chưa chạy
   if (event.code === 'Space' && !isGameRunning) {
-    event.preventDefault()
-    startGame()
+    event.preventDefault() // Ngăn không cho trình duyệt cuộn trang
+    startGame() // Bắt đầu game khi nhấn Space
   } else if (event.code === 'Escape' && isGameRunning) {
-    event.preventDefault()
-    togglePause()
+    event.preventDefault() // Ngăn không cho trình duyệt xử lý phím Esc
+    togglePause() // Tạm dừng/tiếp tục game khi nhấn Esc
   }
 }
 
-// Xử lý sự kiện chạm màn hình (dành cho thiết bị cảm ứng)
+// Xử lý sự kiện chạm màn hình cho thiết bị di động cảm ứng
 function handleTouchStart(event) {
+  // Khi chạm màn hình khi game chưa chạy thì bắt đầu game
   if (event.code === 'Space' && !isGameRunning) {
-    event.preventDefault()
-    startGame()
+    event.preventDefault() // Ngăn hành vi mặc định của trình duyệt
+    startGame() // Bắt đầu game khi chạm màn hình
   } else if (event.code === 'Escape' && isGameRunning) {
-    event.preventDefault()
-    togglePause()
+    event.preventDefault() // Ngăn hành vi mặc định 
+    togglePause() // Tạm dừng/tiếp tục game khi chạm nút tạm dừng
   }
 }
 
-// Hiển thị lại menu chính khi kết thúc hoặc tạm dừng game
+// Hiển thị menu chính và đặt lại trạng thái game
 function showMainMenu() {
-  // Hiển thị lại menu chính khi kết thúc hoặc tạm dừng game
-  mainMenuElem.style.display = 'flex'
-  worldElem.classList.remove('show')
-  isGameRunning = false
-  resetGameState()
+  // Hiển thị menu chính và ẩn thế giới game
+  mainMenuElem.style.display = 'flex' // Hiển thị menu chính
+  worldElem.classList.remove('show') // Ẩn thế giới game
+  isGameRunning = false // Đặt trạng thái game về chưa chạy
+  resetGameState() // Đặt lại toàn bộ trạng thái game về mặc định
 }
 
 // Bắt đầu trò chơi
