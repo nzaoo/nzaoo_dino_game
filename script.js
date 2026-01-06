@@ -5,7 +5,6 @@ import { updateCactus, setupCactus, getCactusRects } from "./cactus.js"
 import { updatePowerup, setupPowerup, getIsInvincible, activateInvincibility } from "./powerup.js"
 import { updateBoss, setupBoss, getBossRect, isBossActive, getBossProjectiles } from "./boss.js"
 
-// Định nghĩa chiều rộng thế giới game (đơn vị ảo)
 const WORLD_WIDTH = 100 // Chiều rộng thế giới game (đơn vị ảo)
 // Định nghĩa chiều cao thế giới game (đơn vị ảo)
 const WORLD_HEIGHT = 30 // Chiều cao thế giới game (đơn vị ảo)
@@ -581,13 +580,19 @@ function update(time) {
   window.requestAnimationFrame(update)
 }
 
-// Kiểm tra điều kiện thua game
+// Kiểm tra các điều kiện dẫn đến thua game (va chạm với chướng ngại vật, boss, đạn)
 function checkLose() {
-  const dinoRect = shrinkRect(getDinoRect(), 5)
-  if (getIsInvincible()) return false
+  const dinoRect = shrinkRect(getDinoRect(), 5) // Lấy hình chữ nhật khung va chạm của khủng long
+  if (getIsInvincible()) return false // Nếu đang bất tử thì không thua
+  
+  // Kiểm tra va chạm với boss
   const bossRect = getBossRect()
   if (bossRect && isBossActive() && isCollision(bossRect, dinoRect)) return true
+  
+  // Kiểm tra va chạm với đạn của boss
   if (getBossProjectiles().some(rect => isCollision(rect, dinoRect))) return true
+  
+  // Kiểm tra va chạm với xương rồng
   return (
     getCactusRects().some(rect => isCollision(shrinkRect(rect, 5), dinoRect))
   )
@@ -735,8 +740,7 @@ function handleLose() {
 }
 
 function setPixelToWorldScale() {
-  // Tính toán tỷ lệ để hiển thị game phù hợp với kích thước màn hình
-  let worldToPixelScale
+    let worldToPixelScale
   if (window.innerWidth / window.innerHeight < WORLD_WIDTH / WORLD_HEIGHT) {
     worldToPixelScale = window.innerWidth / WORLD_WIDTH
   } else {
