@@ -1,6 +1,6 @@
 // Commit 27: Thêm comment nhỏ tiếp tục tăng số lượng commit
 import { updateGround, setupGround } from "./ground.js"
-import { updateDino, setupDino, getDinoRect, setDinoLose } from "./dino.js"
+import { updateDino, setupDino, getDinoRect, setDinoLose, removeDinoJumpClass } from "./dino.js"
 import { updateCactus, setupCactus, getCactusRects } from "./cactus.js"
 import { updatePowerup, setupPowerup, getIsInvincible, activateInvincibility } from "./powerup.js"
 import { updateBoss, setupBoss, getBossRect, isBossActive, getBossProjectiles } from "./boss.js"
@@ -384,10 +384,10 @@ function resetGameState() {
   lastTime = null
   speedScale = 1
   speedScaleTarget = 1
-  score = 0
-  maxCombo = 0
-  comboCount = 0
-  lastObstaclePassed = null
+  score = 0                                                                       
+  maxCombo = 0                                                                        
+  comboCount = 0                                                                        
+  lastObstaclePassed = null                                                                       
   bossPause = false
   isPaused = false
   
@@ -422,7 +422,7 @@ function togglePause() {
 // Khởi động lại game sau khi thua hoặc từ menu tạm dừng
 function restartGame() {
   // Khởi động lại game sau khi thua hoặc từ menu tạm dừng
-  hideModal(gameoverModal)
+  hideModal(gameoverModal)  
   startGame()
 }
 
@@ -434,7 +434,7 @@ function showModal(modal) {
 // Ẩn modal (hộp thoại) truyền vào
 function hideModal(modal) {
   modal.classList.remove('show')
-}
+}x  
 
 // Hiển thị màn hình Game Over và cập nhật thống kê
 function showGameOver() {

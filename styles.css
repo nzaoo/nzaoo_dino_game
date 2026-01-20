@@ -6,6 +6,13 @@
   user-select: none;
 }
 
+/* Enable GPU acceleration for smoother animations */
+.world, .dino, .cactus, .ground, .powerup, .boss, .boss-projectile {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
 :root {
   --primary-color: #2c3e50;
   --secondary-color: #3498db;
@@ -477,10 +484,24 @@ body.theme-ocean .mode-btn:hover {
   overflow: hidden;
   position: relative;
   display: none;
+  perspective: 1000px;
+  transform-style: preserve-3d;
 }
 
 .world.show {
   display: block;
+}
+
+.world::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(to top, rgba(0,0,0,0.15) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 1;
 }
 
 .game-header {
@@ -661,6 +682,9 @@ body.theme-ocean .mode-btn:hover {
   width: 300%;
   bottom: 0;
   left: calc(var(--left) * 1%);
+  filter: drop-shadow(0 -2px 4px rgba(0,0,0,0.1));
+  transform: perspective(500px) rotateX(2deg);
+  transform-origin: bottom center;
 }
 
 .dino {
@@ -669,7 +693,26 @@ body.theme-ocean .mode-btn:hover {
   left: 1%;
   height: 30%;
   bottom: calc(var(--bottom) * 1%);
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  transition: transform 0.05s ease-out;
+  transform-origin: bottom center;
+}
+
+.dino.jumping {
+  transform: scale(1.05) rotate(-5deg);
+}
+
+.dino::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 10px;
+  background: radial-gradient(ellipse, rgba(0,0,0,0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  z-index: -1;
 }
 
 .cactus {
@@ -677,7 +720,21 @@ body.theme-ocean .mode-btn:hover {
   left: calc(var(--left) * 1%);
   height: 30%;
   bottom: 0;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.35)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  transform: perspective(200px) rotateY(-3deg);
+  transition: transform 0.1s ease-out;
+}
+
+.cactus::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  height: 8px;
+  background: radial-gradient(ellipse, rgba(0,0,0,0.25) 0%, transparent 70%);
+  border-radius: 50%;
 }
 
 .powerup {
@@ -685,9 +742,10 @@ body.theme-ocean .mode-btn:hover {
   left: calc(var(--left) * 1%);
   height: 15%;
   bottom: calc(var(--bottom) * 1%);
-  filter: drop-shadow(0 0 8px gold);
+  filter: drop-shadow(0 0 16px gold) drop-shadow(0 4px 8px rgba(255,215,0,0.5));
   z-index: 3;
-  animation: powerupFloat 2s ease-in-out infinite;
+  animation: powerupFloat 2s ease-in-out infinite, powerupSpin 4s linear infinite;
+  transform-style: preserve-3d;
 }
 
 .boss {
@@ -696,8 +754,22 @@ body.theme-ocean .mode-btn:hover {
   height: 32%;
   bottom: calc(var(--bottom) * 1%);
   z-index: 4;
-  filter: drop-shadow(0 0 16px red);
-  animation: bossShake 0.1s ease-in-out infinite;
+  filter: drop-shadow(0 0 24px rgba(255,0,0,0.8)) drop-shadow(0 8px 16px rgba(0,0,0,0.5));
+  animation: bossShake 0.08s ease-in-out infinite, bossPulse 1s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+
+.boss::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 15px;
+  background: radial-gradient(ellipse, rgba(255,0,0,0.4) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: bossShadowPulse 1s ease-in-out infinite;
 }
 
 .boss-projectile {
@@ -706,11 +778,24 @@ body.theme-ocean .mode-btn:hover {
   bottom: calc(var(--bottom) * 1%);
   width: 2.5vw;
   height: 2.5vw;
-  background: radial-gradient(circle at 40% 40%, #ff3c00 70%, #fff 100%);
+  background: radial-gradient(circle at 30% 30%, #fff 0%, #ff6b35 30%, #ff3c00 70%, #8b0000 100%);
   border-radius: 50%;
-  box-shadow: 0 0 16px 4px #ff3c00;
+  box-shadow: 0 0 20px 6px rgba(255,60,0,0.8), 0 0 40px 12px rgba(255,60,0,0.4), inset 0 0 10px rgba(255,255,255,0.5);
   z-index: 5;
-  animation: projectileGlow 0.5s ease-in-out infinite alternate;
+  animation: projectileGlow 0.3s ease-in-out infinite alternate, projectileSpin 0.5s linear infinite;
+}
+
+.boss-projectile::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 60%;
+  background: linear-gradient(to right, rgba(255,60,0,0.6) 0%, transparent 100%);
+  border-radius: 0 50% 50% 0;
+  filter: blur(4px);
 }
 
 .hide {
@@ -774,33 +859,49 @@ body.theme-ocean .mode-btn:hover {
 @keyframes powerupFloat {
   0%,
   100% {
-    transform: translateY(0px);
+    transform: translateY(0px) rotateY(0deg);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-15px) rotateY(180deg);
   }
 }
 
+@keyframes powerupSpin {
+  from { transform: rotateY(0deg); }
+  to { transform: rotateY(360deg); }
+}
+
 @keyframes bossShake {
-  0%,
-  100% {
-    transform: translateX(0px);
-  }
-  50% {
-    transform: translateX(2px);
-  }
+  0%, 100% { transform: translateX(0px) scale(1); }
+  25% { transform: translateX(-2px) scale(1.01); }
+  75% { transform: translateX(2px) scale(0.99); }
+}
+
+@keyframes bossPulse {
+  0%, 100% { filter: drop-shadow(0 0 24px rgba(255,0,0,0.8)) drop-shadow(0 8px 16px rgba(0,0,0,0.5)); }
+  50% { filter: drop-shadow(0 0 32px rgba(255,0,0,1)) drop-shadow(0 8px 20px rgba(0,0,0,0.6)); }
+}
+
+@keyframes bossShadowPulse {
+  0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.4; }
+  50% { transform: translateX(-50%) scale(1.2); opacity: 0.6; }
 }
 
 @keyframes projectileGlow {
   from {
-    box-shadow: 0 0 16px 4px #ff3c00;
+    box-shadow: 0 0 20px 6px rgba(255,60,0,0.8), 0 0 40px 12px rgba(255,60,0,0.4), inset 0 0 10px rgba(255,255,255,0.5);
+    transform: scale(1);
   }
   to {
-    box-shadow: 0 0 24px 6px #ff3c00;
+    box-shadow: 0 0 30px 10px rgba(255,60,0,1), 0 0 60px 20px rgba(255,60,0,0.5), inset 0 0 15px rgba(255,255,255,0.7);
+    transform: scale(1.1);
   }
 }
 
-@keyframes comboPulse {
+@keyframes projectileSpin {
+  from { rotate: 0deg; }
+  to { rotate: 360deg; }
+}
   0% {
     transform: scale(1);
   }
