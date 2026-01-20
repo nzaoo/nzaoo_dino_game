@@ -1,112 +1,72 @@
-// Commit 22: Thêm comment nhỏ tiếp tục tăng số lượng commit
-import {
-  setCustomProperty,
-  incrementCustomProperty,
-  getCustomProperty,
-} from "./updateCustomProperty.js"
+import { setCustomProperty, incrementCustomProperty, getCustomProperty } from "./updateCustomProperty.js"
 
-const SPEED = 0.09
-const BOSS_INTERVAL_SCORE = 2000 // xuất hiện mỗi 2000 điểm
-const BOSS_DURATION = 6000 // ms boss ở lại
+const SPEED = 0.09, PROJECTILE_SPEED = 0.18
+const BOSS_INTERVAL_SCORE = 2000, BOSS_DURATION = 6000, PROJECTILE_INTERVAL = 1200
 const worldElem = document.querySelector("[data-world]")
 
-let bossActive = false
-let bossTimeout = null
-let projectiles = []
-const PROJECTILE_SPEED = 0.18
-const PROJECTILE_INTERVAL = 1200 // ms
-let projectileIntervalId = null
+let bossActive = false, bossTimeout = null, projectileIntervalId = null, projectiles = []
 
-// Thiết lập lại trạng thái boss khi bắt đầu game hoặc sau khi boss biến mất
-export function setupBoss() {
+const getBoss = () => document.querySelector('[data-boss]')
+const removeBoss = () => document.querySelectorAll('[data-boss]').forEach(b => b.remove())
+const clearProjectiles = () => { projectiles.forEach(p => p.remove()); projectiles = [] }
+
+function endBoss(onBossEnd) {
   removeBoss()
   bossActive = false
-  if (bossTimeout) clearTimeout(bossTimeout)
+  onBossEnd?.()
   clearProjectiles()
-  if (projectileIntervalId) clearInterval(projectileIntervalId)
-}
-
-// Cập nhật trạng thái boss, di chuyển boss và xử lý đạn của boss
-export function updateBoss(delta, score, onBossStart, onBossEnd) {
-  if (!bossActive && Math.floor(score) > 0 && Math.floor(score) % BOSS_INTERVAL_SCORE === 0) {
-    spawnBoss()
-    bossActive = true
-    onBossStart && onBossStart()
-    bossTimeout = setTimeout(() => {
-      removeBoss()
-      bossActive = false
-      onBossEnd && onBossEnd()
-      clearProjectiles()
-      if (projectileIntervalId) clearInterval(projectileIntervalId)
-    }, BOSS_DURATION)
-    // Bắt đầu bắn đạn
-    projectileIntervalId = setInterval(() => {
-      if (bossActive) spawnProjectile()
-    }, PROJECTILE_INTERVAL)
-  }
-  // Di chuyển boss nếu đang active
-  const boss = document.querySelector('[data-boss]')
-  if (boss) {
-    incrementCustomProperty(boss, "--left", delta * SPEED * -1)
-    if (getCustomProperty(boss, "--left") <= -10) {
-      removeBoss()
-      bossActive = false
-      onBossEnd && onBossEnd()
-      clearProjectiles()
-      if (projectileIntervalId) clearInterval(projectileIntervalId)
-    }
-  }
-  // Di chuyển đạn
-  projectiles.forEach(p => {
-    incrementCustomProperty(p, "--left", delta * PROJECTILE_SPEED * -1)
-    if (getCustomProperty(p, "--left") <= -10) {
-      p.remove()
-    }
-  })
-  projectiles = projectiles.filter(p => p.isConnected)
-}
-
-export function getBossRect() {
-  const boss = document.querySelector('[data-boss]')
-  return boss ? boss.getBoundingClientRect() : null
-}
-
-export function isBossActive() {
-  return bossActive
-}
-
-export function getBossProjectiles() {
-  return projectiles.map(p => p.getBoundingClientRect())
+  clearInterval(projectileIntervalId)
 }
 
 function spawnBoss() {
   removeBoss()
-  const boss = document.createElement("img")
+  const boss = Object.assign(document.createElement("img"), { src: "imgs/rock.png" })
   boss.dataset.boss = true
-  boss.src = "imgs/rock.png" // tạm dùng ảnh rock, sau sẽ thay bằng boss
   boss.classList.add("boss")
   setCustomProperty(boss, "--left", 100)
   setCustomProperty(boss, "--bottom", 18)
   worldElem.append(boss)
 }
 
-function removeBoss() {
-  document.querySelectorAll('[data-boss]').forEach(boss => boss.remove())
-}
-
 function spawnProjectile() {
-  const boss = document.querySelector('[data-boss]')
+  const boss = getBoss()
   if (!boss) return
-  const projectile = document.createElement('div')
-  projectile.classList.add('boss-projectile')
-  setCustomProperty(projectile, '--left', getCustomProperty(boss, '--left'))
-  setCustomProperty(projectile, '--bottom', 20)
-  worldElem.append(projectile)
-  projectiles.push(projectile)
+  const p = document.createElement('div')
+  p.classList.add('boss-projectile')
+  setCustomProperty(p, '--left', getCustomProperty(boss, '--left'))
+  setCustomProperty(p, '--bottom', 20)
+  worldElem.append(p)
+  projectiles.push(p)
 }
 
-function clearProjectiles() {
-  projectiles.forEach(p => p.remove())
-  projectiles = []
-} 
-// Commit 15: Thêm comment nhỏ ở cuối file 
+export function setupBoss() {
+  endBoss()
+  clearTimeout(bossTimeout)
+}
+
+export function updateBoss(delta, score, onBossStart, onBossEnd) {
+  const floorScore = Math.floor(score)
+  if (!bossActive && floorScore > 0 && floorScore % BOSS_INTERVAL_SCORE === 0) {
+    spawnBoss()
+    bossActive = true
+    onBossStart?.()
+    bossTimeout = setTimeout(() => endBoss(onBossEnd), BOSS_DURATION)
+    projectileIntervalId = setInterval(() => bossActive && spawnProjectile(), PROJECTILE_INTERVAL)
+  }
+
+  const boss = getBoss()
+  if (boss) {
+    incrementCustomProperty(boss, "--left", -delta * SPEED)
+    if (getCustomProperty(boss, "--left") <= -10) endBoss(onBossEnd)
+  }
+
+  projectiles.forEach(p => {
+    incrementCustomProperty(p, "--left", -delta * PROJECTILE_SPEED)
+    if (getCustomProperty(p, "--left") <= -10) p.remove()
+  })
+  projectiles = projectiles.filter(p => p.isConnected)
+}
+
+export const getBossRect = () => getBoss()?.getBoundingClientRect() ?? null
+export const isBossActive = () => bossActive
+export const getBossProjectiles = () => projectiles.map(p => p.getBoundingClientRect())

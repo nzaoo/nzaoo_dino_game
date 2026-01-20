@@ -90,6 +90,7 @@ function handleJump(delta) {
     isJumping = false
     isHoldingJump = false
     jumpHoldTime = 0
+    dinoElem.classList.remove('jumping')
   }
 
   if (isHoldingJump && jumpHoldTime < MAX_JUMP_HOLD_TIME) {
@@ -106,6 +107,7 @@ function onJump(e) {
   isJumping = true
   isHoldingJump = true
   jumpHoldTime = 0
+  dinoElem.classList.add('jumping')
 }
 
 function onJumpRelease(e) {
@@ -113,4 +115,6 @@ function onJumpRelease(e) {
   isHoldingJump = false
 }
 
-// Commit 18: Thêm comment nhỏ ở cuối file
+export function removeDinoJumpClass() {
+  dinoElem.classList.remove('jumping')
+}
