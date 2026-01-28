@@ -10,11 +10,11 @@ const CONFIG = {
   groundLength: 200,
   laneWidth: 3,
   
-  // Dino
-  dinoSize: 1,
-  jumpHeight: 3.5,
-  jumpDuration: 600,
-  gravity: 0.015,
+  // Dino - bigger dino needs higher jump
+  dinoSize: 2.5,
+  jumpHeight: 5,
+  jumpDuration: 700,
+  gravity: 0.018,
   
   // Game
   baseSpeed: 0.15,
@@ -24,10 +24,11 @@ const CONFIG = {
   powerupInterval: { min: 5000, max: 15000 },
   
   // Visual
-  fogNear: 30,
-  fogFar: 80,
-  cameraHeight: 3,
-  cameraDistance: 8,
+  fogNear: 40,
+  fogFar: 100,
+  cameraHeight: 5,
+  cameraDistance: 12,
+  cameraFOV: 70,
 };
 
 // ==================== GAME STATE ====================
@@ -102,15 +103,15 @@ function initThreeJS() {
   scene.background = new THREE.Color(0x1a1a2e);
   scene.fog = new THREE.Fog(0x1a1a2e, CONFIG.fogNear, CONFIG.fogFar);
   
-  // Camera
+  // Camera - góc nhìn rộng hơn để thấy dino to và rõ
   camera = new THREE.PerspectiveCamera(
-    60,
+    CONFIG.cameraFOV,
     window.innerWidth / window.innerHeight,
     0.1,
     1000
   );
   camera.position.set(0, CONFIG.cameraHeight, CONFIG.cameraDistance);
-  camera.lookAt(0, 1, 0);
+  camera.lookAt(0, 2, 0);
   
   // Renderer
   renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -250,101 +251,262 @@ function createGround() {
 }
 
 function createDino() {
-  // Create a stylized low-poly dino
+  // Create a massive, detailed T-Rex style dino
   const dinoGroup = new THREE.Group();
   
-  // Body
-  const bodyGeometry = new THREE.BoxGeometry(0.8, 1, 1.2);
+  // Scale factor - make dino 2.5x bigger
+  const scale = 2.5;
+  
+  // Main body material
   const bodyMaterial = new THREE.MeshStandardMaterial({
     color: state.selectedColor,
-    roughness: 0.5,
+    roughness: 0.4,
     metalness: 0.3,
   });
+  
+  // Darker shade for accents
+  const darkMaterial = new THREE.MeshStandardMaterial({
+    color: state.selectedColor,
+    roughness: 0.6,
+    metalness: 0.2,
+  });
+  darkMaterial.color.multiplyScalar(0.7);
+  
+  // ===== MAIN BODY =====
+  const bodyGeometry = new THREE.BoxGeometry(1.2 * scale, 1.4 * scale, 2 * scale);
   const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-  body.position.y = 0.5;
+  body.position.y = 1.2 * scale;
   body.castShadow = true;
   dinoGroup.add(body);
   
-  // Head
-  const headGeometry = new THREE.BoxGeometry(0.6, 0.6, 0.8);
+  // Chest (slightly forward)
+  const chestGeometry = new THREE.BoxGeometry(1.1 * scale, 1.2 * scale, 0.8 * scale);
+  const chest = new THREE.Mesh(chestGeometry, bodyMaterial);
+  chest.position.set(0, 1.1 * scale, 0.9 * scale);
+  chest.castShadow = true;
+  dinoGroup.add(chest);
+  
+  // ===== NECK =====
+  const neckGeometry = new THREE.CylinderGeometry(0.4 * scale, 0.5 * scale, 1 * scale, 8);
+  const neck = new THREE.Mesh(neckGeometry, bodyMaterial);
+  neck.position.set(0, 2.2 * scale, 0.8 * scale);
+  neck.rotation.x = -0.3;
+  neck.castShadow = true;
+  dinoGroup.add(neck);
+  
+  // ===== HEAD =====
+  const headGeometry = new THREE.BoxGeometry(0.9 * scale, 0.8 * scale, 1.4 * scale);
   const head = new THREE.Mesh(headGeometry, bodyMaterial);
-  head.position.set(0, 1.1, 0.5);
+  head.position.set(0, 2.8 * scale, 1.3 * scale);
   head.castShadow = true;
   dinoGroup.add(head);
   
-  // Eyes
-  const eyeGeometry = new THREE.SphereGeometry(0.1, 8, 8);
+  // Snout
+  const snoutGeometry = new THREE.BoxGeometry(0.7 * scale, 0.5 * scale, 0.8 * scale);
+  const snout = new THREE.Mesh(snoutGeometry, bodyMaterial);
+  snout.position.set(0, 2.6 * scale, 2 * scale);
+  snout.castShadow = true;
+  dinoGroup.add(snout);
+  
+  // Jaw
+  const jawGeometry = new THREE.BoxGeometry(0.6 * scale, 0.25 * scale, 0.7 * scale);
+  const jaw = new THREE.Mesh(jawGeometry, darkMaterial);
+  jaw.position.set(0, 2.3 * scale, 1.9 * scale);
+  jaw.castShadow = true;
+  dinoGroup.add(jaw);
+  
+  // ===== EYES =====
+  const eyeGeometry = new THREE.SphereGeometry(0.18 * scale, 16, 16);
   const eyeMaterial = new THREE.MeshStandardMaterial({
     color: 0xffffff,
     emissive: 0xffffff,
-    emissiveIntensity: 0.5,
+    emissiveIntensity: 0.8,
   });
   
   const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-  leftEye.position.set(-0.2, 1.2, 0.85);
+  leftEye.position.set(-0.35 * scale, 2.95 * scale, 1.7 * scale);
   dinoGroup.add(leftEye);
   
   const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-  rightEye.position.set(0.2, 1.2, 0.85);
+  rightEye.position.set(0.35 * scale, 2.95 * scale, 1.7 * scale);
   dinoGroup.add(rightEye);
   
   // Pupils
-  const pupilGeometry = new THREE.SphereGeometry(0.05, 8, 8);
+  const pupilGeometry = new THREE.SphereGeometry(0.1 * scale, 8, 8);
   const pupilMaterial = new THREE.MeshStandardMaterial({ color: 0x000000 });
   
   const leftPupil = new THREE.Mesh(pupilGeometry, pupilMaterial);
-  leftPupil.position.set(-0.2, 1.2, 0.92);
+  leftPupil.position.set(-0.35 * scale, 2.95 * scale, 1.88 * scale);
   dinoGroup.add(leftPupil);
   
   const rightPupil = new THREE.Mesh(pupilGeometry, pupilMaterial);
-  rightPupil.position.set(0.2, 1.2, 0.92);
+  rightPupil.position.set(0.35 * scale, 2.95 * scale, 1.88 * scale);
   dinoGroup.add(rightPupil);
   
-  // Tail
-  const tailGeometry = new THREE.ConeGeometry(0.2, 1, 4);
-  const tail = new THREE.Mesh(tailGeometry, bodyMaterial);
-  tail.position.set(0, 0.5, -0.8);
-  tail.rotation.x = Math.PI / 2;
-  tail.castShadow = true;
-  dinoGroup.add(tail);
+  // ===== TEETH =====
+  const toothGeometry = new THREE.ConeGeometry(0.05 * scale, 0.15 * scale, 4);
+  const toothMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
   
-  // Legs
-  const legGeometry = new THREE.BoxGeometry(0.25, 0.5, 0.25);
+  for (let i = 0; i < 6; i++) {
+    const tooth = new THREE.Mesh(toothGeometry, toothMaterial);
+    tooth.position.set(
+      (i - 2.5) * 0.12 * scale,
+      2.35 * scale,
+      2.1 * scale
+    );
+    tooth.rotation.x = Math.PI;
+    dinoGroup.add(tooth);
+  }
   
-  const frontLeftLeg = new THREE.Mesh(legGeometry, bodyMaterial);
-  frontLeftLeg.position.set(-0.25, 0.25, 0.3);
-  frontLeftLeg.castShadow = true;
-  dinoGroup.add(frontLeftLeg);
+  // ===== SPIKES ON BACK =====
+  const spikeGeometry = new THREE.ConeGeometry(0.12 * scale, 0.4 * scale, 4);
+  const spikeMaterial = new THREE.MeshStandardMaterial({
+    color: state.selectedColor,
+    emissive: state.selectedColor,
+    emissiveIntensity: 0.3,
+  });
+  spikeMaterial.color.multiplyScalar(0.8);
   
-  const frontRightLeg = new THREE.Mesh(legGeometry, bodyMaterial);
-  frontRightLeg.position.set(0.25, 0.25, 0.3);
-  frontRightLeg.castShadow = true;
-  dinoGroup.add(frontRightLeg);
+  for (let i = 0; i < 7; i++) {
+    const spike = new THREE.Mesh(spikeGeometry, spikeMaterial);
+    spike.position.set(
+      0,
+      2 * scale + 0.3 * scale,
+      -0.8 * scale + i * 0.35 * scale
+    );
+    spike.castShadow = true;
+    dinoGroup.add(spike);
+  }
   
-  const backLeftLeg = new THREE.Mesh(legGeometry, bodyMaterial);
-  backLeftLeg.position.set(-0.25, 0.25, -0.3);
-  backLeftLeg.castShadow = true;
-  dinoGroup.add(backLeftLeg);
+  // ===== TAIL =====
+  // Tail base
+  const tailBase = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.4 * scale, 0.5 * scale, 1.2 * scale, 8),
+    bodyMaterial
+  );
+  tailBase.position.set(0, 1 * scale, -1.3 * scale);
+  tailBase.rotation.x = Math.PI / 2 + 0.2;
+  tailBase.castShadow = true;
+  dinoGroup.add(tailBase);
   
-  const backRightLeg = new THREE.Mesh(legGeometry, bodyMaterial);
-  backRightLeg.position.set(0.25, 0.25, -0.3);
-  backRightLeg.castShadow = true;
-  dinoGroup.add(backRightLeg);
+  // Tail middle
+  const tailMid = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.25 * scale, 0.4 * scale, 1.5 * scale, 8),
+    bodyMaterial
+  );
+  tailMid.position.set(0, 0.7 * scale, -2.3 * scale);
+  tailMid.rotation.x = Math.PI / 2 + 0.3;
+  tailMid.castShadow = true;
+  dinoGroup.add(tailMid);
   
-  // Glow effect
-  const glowGeometry = new THREE.SphereGeometry(1.2, 16, 16);
+  // Tail tip
+  const tailTip = new THREE.Mesh(
+    new THREE.ConeGeometry(0.25 * scale, 1.2 * scale, 6),
+    bodyMaterial
+  );
+  tailTip.position.set(0, 0.4 * scale, -3.2 * scale);
+  tailTip.rotation.x = Math.PI / 2 + 0.4;
+  tailTip.castShadow = true;
+  dinoGroup.add(tailTip);
+  
+  // ===== ARMS (T-Rex style - small) =====
+  const armGeometry = new THREE.BoxGeometry(0.15 * scale, 0.5 * scale, 0.15 * scale);
+  
+  const leftArm = new THREE.Mesh(armGeometry, bodyMaterial);
+  leftArm.position.set(-0.5 * scale, 1.3 * scale, 0.8 * scale);
+  leftArm.rotation.z = 0.3;
+  leftArm.rotation.x = -0.5;
+  leftArm.castShadow = true;
+  dinoGroup.add(leftArm);
+  
+  const rightArm = new THREE.Mesh(armGeometry, bodyMaterial);
+  rightArm.position.set(0.5 * scale, 1.3 * scale, 0.8 * scale);
+  rightArm.rotation.z = -0.3;
+  rightArm.rotation.x = -0.5;
+  rightArm.castShadow = true;
+  dinoGroup.add(rightArm);
+  
+  // ===== LEGS (Massive) =====
+  // Upper legs
+  const upperLegGeometry = new THREE.BoxGeometry(0.5 * scale, 1 * scale, 0.6 * scale);
+  
+  const leftUpperLeg = new THREE.Mesh(upperLegGeometry, bodyMaterial);
+  leftUpperLeg.position.set(-0.45 * scale, 0.7 * scale, -0.2 * scale);
+  leftUpperLeg.castShadow = true;
+  leftUpperLeg.name = 'leftUpperLeg';
+  dinoGroup.add(leftUpperLeg);
+  
+  const rightUpperLeg = new THREE.Mesh(upperLegGeometry, bodyMaterial);
+  rightUpperLeg.position.set(0.45 * scale, 0.7 * scale, -0.2 * scale);
+  rightUpperLeg.castShadow = true;
+  rightUpperLeg.name = 'rightUpperLeg';
+  dinoGroup.add(rightUpperLeg);
+  
+  // Lower legs
+  const lowerLegGeometry = new THREE.BoxGeometry(0.35 * scale, 0.8 * scale, 0.4 * scale);
+  
+  const leftLowerLeg = new THREE.Mesh(lowerLegGeometry, darkMaterial);
+  leftLowerLeg.position.set(-0.45 * scale, 0.15 * scale, 0 * scale);
+  leftLowerLeg.castShadow = true;
+  leftLowerLeg.name = 'leftLowerLeg';
+  dinoGroup.add(leftLowerLeg);
+  
+  const rightLowerLeg = new THREE.Mesh(lowerLegGeometry, darkMaterial);
+  rightLowerLeg.position.set(0.45 * scale, 0.15 * scale, 0 * scale);
+  rightLowerLeg.castShadow = true;
+  rightLowerLeg.name = 'rightLowerLeg';
+  dinoGroup.add(rightLowerLeg);
+  
+  // Feet
+  const footGeometry = new THREE.BoxGeometry(0.5 * scale, 0.2 * scale, 0.7 * scale);
+  
+  const leftFoot = new THREE.Mesh(footGeometry, darkMaterial);
+  leftFoot.position.set(-0.45 * scale, 0.1 * scale, 0.2 * scale);
+  leftFoot.castShadow = true;
+  dinoGroup.add(leftFoot);
+  
+  const rightFoot = new THREE.Mesh(footGeometry, darkMaterial);
+  rightFoot.position.set(0.45 * scale, 0.1 * scale, 0.2 * scale);
+  rightFoot.castShadow = true;
+  dinoGroup.add(rightFoot);
+  
+  // ===== GLOW EFFECT =====
+  const glowGeometry = new THREE.SphereGeometry(2.5 * scale, 16, 16);
   const glowMaterial = new THREE.MeshBasicMaterial({
     color: state.selectedColor,
     transparent: true,
-    opacity: 0.15,
+    opacity: 0.12,
   });
   const glow = new THREE.Mesh(glowGeometry, glowMaterial);
-  glow.position.y = 0.7;
+  glow.position.y = 1.5 * scale;
   glow.name = 'glow';
   dinoGroup.add(glow);
   
+  // ===== AURA RINGS =====
+  const ringGeometry = new THREE.TorusGeometry(1.8 * scale, 0.05 * scale, 8, 32);
+  const ringMaterial = new THREE.MeshBasicMaterial({
+    color: state.selectedColor,
+    transparent: true,
+    opacity: 0.3,
+  });
+  
+  const ring1 = new THREE.Mesh(ringGeometry, ringMaterial);
+  ring1.position.y = 0.3 * scale;
+  ring1.rotation.x = Math.PI / 2;
+  ring1.name = 'ring1';
+  dinoGroup.add(ring1);
+  
+  const ring2 = new THREE.Mesh(ringGeometry.clone(), ringMaterial.clone());
+  ring2.position.y = 0.3 * scale;
+  ring2.rotation.x = Math.PI / 2;
+  ring2.scale.setScalar(1.3);
+  ring2.material.opacity = 0.2;
+  ring2.name = 'ring2';
+  dinoGroup.add(ring2);
+  
   dino = dinoGroup;
-  dino.position.set(0, 0, 5);
+  dino.position.set(0, 0, 4);
+  dino.userData.scale = scale;
   scene.add(dino);
 }
 
@@ -431,44 +593,45 @@ function createObstacle() {
 
 function createCactusObstacle() {
   const group = new THREE.Group();
+  const scale = 2; // Scale up obstacles
   
   // Main stem
-  const stemGeometry = new THREE.CylinderGeometry(0.3, 0.4, 2, 8);
+  const stemGeometry = new THREE.CylinderGeometry(0.4 * scale, 0.5 * scale, 3 * scale, 8);
   const stemMaterial = new THREE.MeshStandardMaterial({
     color: 0x22c55e,
     roughness: 0.7,
   });
   const stem = new THREE.Mesh(stemGeometry, stemMaterial);
-  stem.position.y = 1;
+  stem.position.y = 1.5 * scale;
   stem.castShadow = true;
   group.add(stem);
   
   // Arms
-  const armGeometry = new THREE.CylinderGeometry(0.15, 0.2, 0.8, 6);
+  const armGeometry = new THREE.CylinderGeometry(0.2 * scale, 0.25 * scale, 1.2 * scale, 6);
   
   const leftArm = new THREE.Mesh(armGeometry, stemMaterial);
-  leftArm.position.set(-0.5, 1.2, 0);
+  leftArm.position.set(-0.7 * scale, 1.8 * scale, 0);
   leftArm.rotation.z = Math.PI / 4;
   leftArm.castShadow = true;
   group.add(leftArm);
   
   const rightArm = new THREE.Mesh(armGeometry, stemMaterial);
-  rightArm.position.set(0.5, 1.5, 0);
+  rightArm.position.set(0.7 * scale, 2.2 * scale, 0);
   rightArm.rotation.z = -Math.PI / 4;
   rightArm.castShadow = true;
   group.add(rightArm);
   
   // Spikes (particles effect)
-  const spikeGeometry = new THREE.ConeGeometry(0.05, 0.2, 4);
+  const spikeGeometry = new THREE.ConeGeometry(0.08 * scale, 0.3 * scale, 4);
   const spikeMaterial = new THREE.MeshStandardMaterial({ color: 0x166534 });
   
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 15; i++) {
     const spike = new THREE.Mesh(spikeGeometry, spikeMaterial);
-    const angle = (i / 10) * Math.PI * 2;
+    const angle = (i / 15) * Math.PI * 2;
     spike.position.set(
-      Math.cos(angle) * 0.35,
-      0.5 + Math.random() * 1.5,
-      Math.sin(angle) * 0.35
+      Math.cos(angle) * 0.5 * scale,
+      0.8 * scale + Math.random() * 2.2 * scale,
+      Math.sin(angle) * 0.5 * scale
     );
     spike.lookAt(spike.position.clone().multiplyScalar(2));
     group.add(spike);
@@ -479,30 +642,31 @@ function createCactusObstacle() {
 
 function createRockObstacle() {
   const group = new THREE.Group();
+  const scale = 2; // Scale up obstacles
   
   // Main rock (icosahedron for rough look)
-  const rockGeometry = new THREE.IcosahedronGeometry(0.8, 0);
+  const rockGeometry = new THREE.IcosahedronGeometry(1.2 * scale, 0);
   const rockMaterial = new THREE.MeshStandardMaterial({
     color: 0x6b7280,
     roughness: 0.9,
     flatShading: true,
   });
   const rock = new THREE.Mesh(rockGeometry, rockMaterial);
-  rock.position.y = 0.6;
+  rock.position.y = 1 * scale;
   rock.scale.y = 0.8;
   rock.castShadow = true;
   group.add(rock);
   
   // Smaller rocks
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 4; i++) {
     const smallRock = new THREE.Mesh(
-      new THREE.IcosahedronGeometry(0.3, 0),
+      new THREE.IcosahedronGeometry(0.5 * scale, 0),
       rockMaterial
     );
     smallRock.position.set(
-      (Math.random() - 0.5) * 1.5,
-      0.2,
-      (Math.random() - 0.5) * 1
+      (Math.random() - 0.5) * 2.5 * scale,
+      0.35 * scale,
+      (Math.random() - 0.5) * 1.5 * scale
     );
     smallRock.castShadow = true;
     group.add(smallRock);
@@ -513,9 +677,10 @@ function createRockObstacle() {
 
 function createCrystalObstacle() {
   const group = new THREE.Group();
+  const scale = 2; // Scale up obstacles
   
   // Crystal (octahedron)
-  const crystalGeometry = new THREE.OctahedronGeometry(0.6, 0);
+  const crystalGeometry = new THREE.OctahedronGeometry(0.9 * scale, 0);
   const crystalMaterial = new THREE.MeshStandardMaterial({
     color: 0xef4444,
     emissive: 0xef4444,
@@ -527,21 +692,21 @@ function createCrystalObstacle() {
   });
   
   const crystal = new THREE.Mesh(crystalGeometry, crystalMaterial);
-  crystal.position.y = 1;
-  crystal.scale.set(1, 2, 1);
+  crystal.position.y = 1.5 * scale;
+  crystal.scale.set(1, 2.5, 1);
   crystal.castShadow = true;
   crystal.userData.rotate = true;
   group.add(crystal);
   
   // Glow ring
-  const ringGeometry = new THREE.TorusGeometry(0.8, 0.05, 8, 32);
+  const ringGeometry = new THREE.TorusGeometry(1.2 * scale, 0.08 * scale, 8, 32);
   const ringMaterial = new THREE.MeshBasicMaterial({
     color: 0xef4444,
     transparent: true,
     opacity: 0.5,
   });
   const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-  ring.position.y = 0.5;
+  ring.position.y = 0.8 * scale;
   ring.rotation.x = Math.PI / 2;
   ring.userData.rotate = true;
   group.add(ring);
@@ -570,9 +735,10 @@ function createPowerup() {
   }
   
   const group = new THREE.Group();
+  const scale = 1.8; // Scale up powerups
   
   // Main sphere
-  const sphereGeometry = new THREE.OctahedronGeometry(0.4, 2);
+  const sphereGeometry = new THREE.OctahedronGeometry(0.6 * scale, 2);
   const sphereMaterial = new THREE.MeshStandardMaterial({
     color: color,
     emissive: emissive,
@@ -585,7 +751,7 @@ function createPowerup() {
   group.add(sphere);
   
   // Outer ring
-  const ringGeometry = new THREE.TorusGeometry(0.6, 0.05, 8, 32);
+  const ringGeometry = new THREE.TorusGeometry(0.9 * scale, 0.08 * scale, 8, 32);
   const ringMaterial = new THREE.MeshBasicMaterial({
     color: color,
     transparent: true,
@@ -596,7 +762,7 @@ function createPowerup() {
   group.add(ring);
   
   // Glow
-  const glowGeometry = new THREE.SphereGeometry(0.8, 16, 16);
+  const glowGeometry = new THREE.SphereGeometry(1.2 * scale, 16, 16);
   const glowMaterial = new THREE.MeshBasicMaterial({
     color: color,
     transparent: true,
@@ -605,7 +771,7 @@ function createPowerup() {
   const glow = new THREE.Mesh(glowGeometry, glowMaterial);
   group.add(glow);
   
-  group.position.set(0, 1.5, -CONFIG.groundLength / 2);
+  group.position.set(0, 2.5, -CONFIG.groundLength / 2);
   group.userData.type = 'powerup';
   group.userData.powerupType = type;
   
@@ -680,6 +846,8 @@ function updateGame(delta) {
 }
 
 function updateDino(delta) {
+  const scale = dino.userData.scale || 2.5;
+  
   if (state.isJumping) {
     state.dinoY += state.jumpVelocity;
     state.jumpVelocity -= CONFIG.gravity;
@@ -699,17 +867,34 @@ function updateDino(delta) {
     dino.position.y = state.dinoY;
   }
   
-  // Running animation (bob up and down)
+  // Running animation (bob up and down) - bigger dino, bigger bob
   if (!state.isJumping) {
-    dino.position.y = Math.sin(Date.now() * 0.01) * 0.05;
+    dino.position.y = Math.sin(Date.now() * 0.012) * 0.08;
   }
   
-  // Leg animation
-  const legs = dino.children.filter((_, i) => i >= 6 && i <= 9);
-  legs.forEach((leg, i) => {
-    const offset = i < 2 ? 0 : Math.PI;
-    leg.position.y = 0.25 + Math.sin(Date.now() * 0.015 + offset) * 0.1;
-  });
+  // Leg animation for new dino structure
+  const leftUpperLeg = dino.children.find(c => c.name === 'leftUpperLeg');
+  const rightUpperLeg = dino.children.find(c => c.name === 'rightUpperLeg');
+  const leftLowerLeg = dino.children.find(c => c.name === 'leftLowerLeg');
+  const rightLowerLeg = dino.children.find(c => c.name === 'rightLowerLeg');
+  
+  const runSpeed = Date.now() * 0.015;
+  if (leftUpperLeg) leftUpperLeg.rotation.x = Math.sin(runSpeed) * 0.3;
+  if (rightUpperLeg) rightUpperLeg.rotation.x = Math.sin(runSpeed + Math.PI) * 0.3;
+  if (leftLowerLeg) leftLowerLeg.rotation.x = Math.sin(runSpeed) * 0.2;
+  if (rightLowerLeg) rightLowerLeg.rotation.x = Math.sin(runSpeed + Math.PI) * 0.2;
+  
+  // Rotate aura rings
+  const ring1 = dino.children.find(c => c.name === 'ring1');
+  const ring2 = dino.children.find(c => c.name === 'ring2');
+  if (ring1) ring1.rotation.z += 0.02;
+  if (ring2) ring2.rotation.z -= 0.015;
+  
+  // Pulse glow effect
+  const glow = dino.children.find(c => c.name === 'glow');
+  if (glow) {
+    glow.material.opacity = 0.08 + Math.sin(Date.now() * 0.003) * 0.05;
+  }
 }
 
 function updateObstacles(delta) {
@@ -746,9 +931,9 @@ function updatePowerups(delta) {
     const powerup = powerups[i];
     powerup.position.z += state.speed;
     
-    // Rotate and float
+    // Rotate and float - higher position for bigger powerups
     powerup.rotation.y += 0.03;
-    powerup.position.y = 1.5 + Math.sin(Date.now() * 0.005) * 0.3;
+    powerup.position.y = 3 + Math.sin(Date.now() * 0.005) * 0.5;
     
     // Remove if past camera
     if (powerup.position.z > 10) {
@@ -788,9 +973,11 @@ function updateVisuals(delta) {
 function checkCollisions() {
   if (state.isInvincible) return;
   
+  // Create smaller hitbox for fairness (dino is visually large)
   const dinoBox = new THREE.Box3().setFromObject(dino);
-  dinoBox.min.add(new THREE.Vector3(0.2, 0.2, 0.2));
-  dinoBox.max.sub(new THREE.Vector3(0.2, 0.2, 0.2));
+  // Shrink hitbox significantly so player doesn't feel cheated
+  dinoBox.min.add(new THREE.Vector3(1.5, 0.5, 1.5));
+  dinoBox.max.sub(new THREE.Vector3(1.5, 0.5, 1.5));
   
   // Check obstacles
   for (const obstacle of obstacles) {
