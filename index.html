@@ -2,427 +2,239 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🦖 Dino Runner - Epic Adventure</title>
+  <title>🦖 Dino Runner 3D - Epic Adventure</title>
   <link rel="stylesheet" href="styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="script.js" type="module"></script>
 </head>
 <body>
-  <!-- Animated Background Particles -->
-  <div class="bg-particles" id="particles"></div>
+  <!-- 3D Canvas Container -->
+  <div id="game-container"></div>
 
-  <!-- Main Menu -->
-  <div class="main-menu" data-main-menu>
-    <div class="menu-container">
-      <div class="menu-glow"></div>
+  <!-- UI Overlay -->
+  <div class="ui-overlay">
+    <!-- HUD -->
+    <div class="hud" id="hud">
+      <div class="hud-left">
+        <div class="score-display">
+          <span class="score-icon">⭐</span>
+          <span class="score-value" id="score">0</span>
+        </div>
+        <div class="combo-display" id="combo"></div>
+      </div>
+      <div class="hud-center">
+        <div class="speed-indicator" id="speed-indicator">
+          <span class="speed-label">SPEED</span>
+          <div class="speed-bar">
+            <div class="speed-fill" id="speed-fill"></div>
+          </div>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="high-score-display">
+          <span class="hs-icon">👑</span>
+          <span class="hs-value" id="high-score">0</span>
+        </div>
+        <button class="control-btn" id="sound-btn" title="Âm thanh">🔊</button>
+        <button class="control-btn" id="pause-btn" title="Tạm dừng">⏸️</button>
+      </div>
+    </div>
+
+    <!-- Main Menu -->
+    <div class="main-menu" id="main-menu">
+      <div class="menu-bg"></div>
       <div class="menu-content">
-        <div class="title-wrapper">
-          <h1 class="game-title">
-            <span class="title-icon">🦖</span>
-            <span class="title-text">DINO RUNNER</span>
-            <span class="title-subtitle">Epic Adventure</span>
+        <div class="logo-3d">
+          <h1 class="game-logo">
+            <span class="logo-dino">🦖</span>
+            <span class="logo-text">DINO RUNNER</span>
+            <span class="logo-3d-text">3D</span>
           </h1>
+          <p class="logo-tagline">Ultimate Edition</p>
         </div>
 
-        <div class="character-select" data-character-select>
-          <label class="section-label">🎨 Chọn Nhân Vật</label>
-          <div class="character-grid">
-            <button class="character-btn" data-character="green" title="Dino Xanh - Classic">
-              <div class="char-glow green"></div>
-              <img src="imgs/dino-run-0.png" alt="Dino xanh">
-              <span class="char-name">Classic</span>
+        <div class="menu-section">
+          <label class="section-title">🎨 NHÂN VẬT</label>
+          <div class="character-select" id="character-select">
+            <button class="char-btn selected" data-color="0x4ade80" data-name="Classic">
+              <div class="char-preview green"></div>
+              <span>Classic</span>
             </button>
-            <button class="character-btn" data-character="red" title="Dino Đỏ - Fire">
-              <div class="char-glow red"></div>
-              <img src="imgs/dino-red.png" alt="Dino đỏ">
-              <span class="char-name">Fire</span>
+            <button class="char-btn" data-color="0xef4444" data-name="Fire">
+              <div class="char-preview red"></div>
+              <span>Fire</span>
             </button>
-            <button class="character-btn" data-character="yellow" title="Dino Vàng - Gold">
-              <div class="char-glow yellow"></div>
-              <img src="imgs/dino-yellow.png" alt="Dino vàng">
-              <span class="char-name">Gold</span>
+            <button class="char-btn" data-color="0xfbbf24" data-name="Gold">
+              <div class="char-preview gold"></div>
+              <span>Gold</span>
+            </button>
+            <button class="char-btn" data-color="0x8b5cf6" data-name="Cosmic">
+              <div class="char-preview purple"></div>
+              <span>Cosmic</span>
             </button>
           </div>
         </div>
 
-        <div class="game-mode-select" data-game-mode-select>
-          <label class="section-label">🎮 Chế Độ Chơi</label>
-          <div class="mode-grid">
-            <button class="mode-btn" data-mode="classic" title="Chế độ cổ điển">
+        <div class="menu-section">
+          <label class="section-title">🎮 CHẾ ĐỘ CHƠI</label>
+          <div class="mode-select" id="mode-select">
+            <button class="mode-btn selected" data-mode="classic">
               <span class="mode-icon">🏃</span>
               <span class="mode-name">Classic</span>
               <span class="mode-desc">Chế độ cổ điển</span>
             </button>
-            <button class="mode-btn" data-mode="hard" title="Chế độ khó với Boss">
-              <span class="mode-icon">💀</span>
-              <span class="mode-name">Hard</span>
-              <span class="mode-desc">Boss + Tốc độ cao</span>
+            <button class="mode-btn" data-mode="turbo">
+              <span class="mode-icon">⚡</span>
+              <span class="mode-name">Turbo</span>
+              <span class="mode-desc">Tốc độ cực cao</span>
             </button>
-            <button class="mode-btn" data-mode="endless" title="Chơi vô tận">
+            <button class="mode-btn" data-mode="endless">
               <span class="mode-icon">♾️</span>
               <span class="mode-name">Endless</span>
               <span class="mode-desc">Không giới hạn</span>
             </button>
-            <button class="mode-btn" data-mode="time" title="Đua điểm trong thời gian">
-              <span class="mode-icon">⏱️</span>
-              <span class="mode-name">Time Attack</span>
-              <span class="mode-desc">30 giây thử thách</span>
+            <button class="mode-btn" data-mode="nightmare">
+              <span class="mode-icon">💀</span>
+              <span class="mode-name">Nightmare</span>
+              <span class="mode-desc">Thử thách tối thượng</span>
             </button>
           </div>
         </div>
 
         <div class="menu-buttons">
-          <button class="menu-btn play-btn" data-play-btn>
-            <span class="btn-icon">▶️</span>
-            <span class="btn-text">CHƠI NGAY</span>
-            <div class="btn-shine"></div>
+          <button class="play-btn" id="play-btn">
+            <span class="btn-glow"></span>
+            <span class="btn-text">▶ BẮT ĐẦU</span>
           </button>
-          <div class="secondary-buttons">
-            <button class="menu-btn secondary" data-instructions-btn>
-              <span class="btn-icon">📖</span>
-              <span class="btn-text">Hướng Dẫn</span>
-            </button>
-            <button class="menu-btn secondary" data-leaderboard-btn>
-              <span class="btn-icon">🏆</span>
-              <span class="btn-text">Bảng Xếp Hạng</span>
-            </button>
-            <button class="menu-btn secondary" data-settings-btn>
-              <span class="btn-icon">⚙️</span>
-              <span class="btn-text">Cài Đặt</span>
-            </button>
+          <div class="sub-buttons">
+            <button class="sub-btn" id="leaderboard-btn">🏆 Bảng xếp hạng</button>
+            <button class="sub-btn" id="settings-btn">⚙️ Cài đặt</button>
           </div>
         </div>
 
         <div class="menu-footer">
-          <div class="footer-tip">
-            <span class="key-hint">SPACE</span> hoặc <span class="key-hint">CLICK</span> để nhảy
-          </div>
-          <div class="footer-credits">Made with ❤️ by Nzaoo</div>
+          <p>Nhấn <kbd>SPACE</kbd> hoặc <kbd>CLICK</kbd> để nhảy</p>
+          <p class="credits">Made with ❤️ by Nzaoo</p>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Instructions Modal -->
-  <div class="modal" data-instructions-modal>
-    <div class="modal-overlay"></div>
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2><span class="modal-icon">📖</span> Hướng Dẫn Chơi</h2>
-        <button class="close-btn" data-close-instructions>
-          <span>✕</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="instruction-card">
-          <div class="card-icon">🎮</div>
-          <div class="card-content">
-            <h3>Điều Khiển</h3>
-            <div class="control-item">
-              <span class="key">SPACE</span>
-              <span class="action">Nhảy</span>
-            </div>
-            <div class="control-item">
-              <span class="key">CLICK</span>
-              <span class="action">Nhảy (Mobile)</span>
-            </div>
-            <div class="control-item">
-              <span class="key">ESC</span>
-              <span class="action">Tạm dừng</span>
-            </div>
-          </div>
-        </div>
-        <div class="instruction-card">
-          <div class="card-icon">🎯</div>
-          <div class="card-content">
-            <h3>Mục Tiêu</h3>
-            <ul class="objective-list">
-              <li>🌵 Nhảy qua các chướng ngại vật</li>
-              <li>⭐ Thu thập powerup để tăng sức mạnh</li>
-              <li>🔥 Xây dựng combo để nhận điểm bonus</li>
-              <li>👹 Sống sót qua các trận boss</li>
-            </ul>
-          </div>
-        </div>
-        <div class="instruction-card">
-          <div class="card-icon">💎</div>
-          <div class="card-content">
-            <h3>Power-ups</h3>
-            <div class="powerup-list">
-              <div class="powerup-item">
-                <span class="pu-icon shield">🛡️</span>
-                <span class="pu-name">Bất Tử</span>
-              </div>
-              <div class="powerup-item">
-                <span class="pu-icon score">💰</span>
-                <span class="pu-name">+200 Điểm</span>
-              </div>
-              <div class="powerup-item">
-                <span class="pu-icon jump">🚀</span>
-                <span class="pu-name">Nhảy Cao</span>
-              </div>
-            </div>
-          </div>
-        </div>
+    <!-- Start Overlay -->
+    <div class="start-overlay" id="start-overlay">
+      <div class="start-content">
+        <div class="start-dino">🦖</div>
+        <h2>SẴN SÀNG!</h2>
+        <p>Nhấn <kbd>SPACE</kbd> hoặc <kbd>CLICK</kbd> để bắt đầu</p>
+        <div class="pulse-ring"></div>
       </div>
     </div>
-  </div>
 
-  <!-- Leaderboard Modal -->
-  <div class="modal" data-leaderboard-modal>
-    <div class="modal-overlay"></div>
-    <div class="modal-content">
-      <div class="modal-header gold">
-        <h2><span class="modal-icon">🏆</span> Bảng Xếp Hạng</h2>
-        <button class="close-btn" data-close-leaderboard>
-          <span>✕</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="leaderboard-list" data-leaderboard-list>
-          <div class="empty-leaderboard">
-            <span class="empty-icon">🎮</span>
-            <p>Chưa có điểm số nào</p>
-            <p class="empty-hint">Hãy chơi game để ghi điểm!</p>
-          </div>
-        </div>
-        <div class="leaderboard-actions">
-          <button class="action-btn danger" data-clear-leaderboard>
-            <span>🗑️</span> Xóa Bảng Xếp Hạng
-          </button>
-          <button class="action-btn warning" data-reset-highscore>
-            <span>🔄</span> Reset High Score
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Settings Modal -->
-  <div class="modal" data-settings-modal>
-    <div class="modal-overlay"></div>
-    <div class="modal-content">
-      <div class="modal-header purple">
-        <h2><span class="modal-icon">⚙️</span> Cài Đặt</h2>
-        <button class="close-btn" data-close-settings>
-          <span>✕</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="settings-grid">
-          <div class="setting-card">
-            <div class="setting-icon">🔊</div>
-            <div class="setting-info">
-              <label for="sound-toggle">Hiệu Ứng Âm Thanh</label>
-              <p class="setting-desc">Bật/tắt âm thanh game</p>
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" id="sound-toggle" data-sound-toggle checked>
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="setting-card">
-            <div class="setting-icon">🎵</div>
-            <div class="setting-info">
-              <label for="music-toggle">Nhạc Nền</label>
-              <p class="setting-desc">Bật/tắt nhạc nền</p>
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" id="music-toggle" data-music-toggle>
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="setting-card">
-            <div class="setting-icon">🎯</div>
-            <div class="setting-info">
-              <label for="difficulty-select">Độ Khó</label>
-              <p class="setting-desc">Điều chỉnh độ khó game</p>
-            </div>
-            <select id="difficulty-select" data-difficulty-select class="setting-select">
-              <option value="easy">🟢 Dễ</option>
-              <option value="normal" selected>🟡 Bình thường</option>
-              <option value="hard">🔴 Khó</option>
-            </select>
-          </div>
-          <div class="setting-card">
-            <div class="setting-icon">🎨</div>
-            <div class="setting-info">
-              <label for="theme-select">Giao Diện</label>
-              <p class="setting-desc">Chọn theme yêu thích</p>
-            </div>
-            <select id="theme-select" data-theme-select class="setting-select">
-              <option value="default" selected>🌈 Mặc định</option>
-              <option value="night">🌙 Ban đêm</option>
-              <option value="retro">👾 Retro</option>
-              <option value="ocean">🌊 Đại dương</option>
-              <option value="sunset">🌅 Hoàng hôn</option>
-              <option value="forest">🌲 Rừng xanh</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Game Over Modal -->
-  <div class="modal" data-gameover-modal>
-    <div class="modal-overlay"></div>
-    <div class="modal-content gameover">
-      <div class="modal-header danger">
-        <h2><span class="modal-icon">💥</span> Game Over</h2>
-      </div>
-      <div class="modal-body">
+    <!-- Game Over -->
+    <div class="game-over" id="game-over">
+      <div class="gameover-content">
+        <div class="gameover-icon">💥</div>
+        <h1>GAME OVER</h1>
         <div class="gameover-stats">
-          <div class="stat-card main">
-            <div class="stat-icon">🎯</div>
-            <div class="stat-info">
-              <span class="stat-label">Điểm số</span>
-              <span class="stat-value" data-final-score>0</span>
-            </div>
+          <div class="stat-main">
+            <span class="stat-label">ĐIỂM SỐ</span>
+            <span class="stat-value" id="final-score">0</span>
           </div>
           <div class="stat-row">
-            <div class="stat-card">
-              <div class="stat-icon">👑</div>
-              <div class="stat-info">
-                <span class="stat-label">Kỷ lục</span>
-                <span class="stat-value gold" data-final-highscore>0</span>
-              </div>
+            <div class="stat-item">
+              <span class="stat-icon">👑</span>
+              <span class="stat-label">Kỷ lục</span>
+              <span class="stat-value" id="final-high">0</span>
             </div>
-            <div class="stat-card">
-              <div class="stat-icon">🔥</div>
-              <div class="stat-info">
-                <span class="stat-label">Max Combo</span>
-                <span class="stat-value orange" data-final-combo>0</span>
-              </div>
+            <div class="stat-item">
+              <span class="stat-icon">🔥</span>
+              <span class="stat-label">Max Combo</span>
+              <span class="stat-value" id="final-combo">0</span>
             </div>
           </div>
         </div>
-        <div class="gameover-message" data-gameover-message></div>
+        <div class="new-record" id="new-record">🎉 KỶ LỤC MỚI!</div>
+        <div class="gameover-message" id="gameover-message"></div>
         <div class="gameover-buttons">
-          <button class="menu-btn play-btn" data-restart-btn>
-            <span class="btn-icon">🔄</span>
-            <span class="btn-text">Chơi Lại</span>
-          </button>
-          <button class="menu-btn secondary" data-main-menu-btn>
-            <span class="btn-icon">🏠</span>
-            <span class="btn-text">Menu Chính</span>
-          </button>
+          <button class="retry-btn" id="retry-btn">🔄 CHƠI LẠI</button>
+          <button class="menu-btn" id="menu-btn">🏠 MENU</button>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Pause Menu -->
-  <div class="pause-menu" data-pause-menu>
-    <div class="pause-overlay"></div>
-    <div class="pause-content">
-      <div class="pause-icon">⏸️</div>
-      <h2>Tạm Dừng</h2>
-      <div class="pause-buttons">
-        <button class="menu-btn play-btn" data-resume-btn>
-          <span class="btn-icon">▶️</span>
-          <span class="btn-text">Tiếp Tục</span>
-        </button>
-        <button class="menu-btn secondary" data-pause-main-menu-btn>
-          <span class="btn-icon">🏠</span>
-          <span class="btn-text">Menu Chính</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Game World -->
-  <div class="world" data-world>
-    <div class="world-bg"></div>
-    <div class="clouds">
-      <div class="cloud cloud-1"></div>
-      <div class="cloud cloud-2"></div>
-      <div class="cloud cloud-3"></div>
-    </div>
-    
-    <div class="game-header">
-      <div class="score-container">
-        <div class="score-icon">⭐</div>
-        <div class="score" data-score>0</div>
-      </div>
-      <div class="high-score" data-high-score>
-        <span class="hs-icon">👑</span>
-        <span class="hs-text">High Score: 0</span>
-      </div>
-      <div class="combo" data-combo></div>
-      <div class="timer" data-timer style="display: none;">
-        <span class="timer-icon">⏱️</span>
-        <span class="timer-value" data-timer-value>30</span>
-      </div>
-    </div>
-    
-    <div class="game-controls">
-      <button class="control-btn pause-btn" data-pause-btn title="Tạm dừng">
-        <span>⏸️</span>
-      </button>
-      <button class="control-btn mute-btn" data-mute-btn title="Tắt/Bật âm thanh">
-        <span>🔊</span>
-      </button>
-    </div>
-
-    <div class="start-screen" data-start-screen>
-      <div class="start-content">
-        <div class="start-dino">
-          <img src="imgs/dino-stationary.png" alt="Dino" class="start-dino-img">
+    <!-- Pause Menu -->
+    <div class="pause-menu" id="pause-menu">
+      <div class="pause-content">
+        <div class="pause-icon">⏸️</div>
+        <h2>TẠM DỪNG</h2>
+        <div class="pause-buttons">
+          <button class="resume-btn" id="resume-btn">▶ TIẾP TỤC</button>
+          <button class="quit-btn" id="quit-btn">🏠 THOÁT</button>
         </div>
-        <h2 class="start-title">Sẵn Sàng Chưa?</h2>
-        <div class="start-high-score">
-          <span class="hs-icon">👑</span>
-          High Score: <span data-start-high-score>0</span>
+      </div>
+    </div>
+
+    <!-- Leaderboard Modal -->
+    <div class="modal" id="leaderboard-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>🏆 BẢNG XẾP HẠNG</h2>
+          <button class="close-btn" id="close-leaderboard">✕</button>
         </div>
-        <p class="start-hint">Nhấn <span class="key-hint">SPACE</span> hoặc <span class="key-hint">CLICK</span> để bắt đầu</p>
-        <div class="start-pulse"></div>
+        <div class="leaderboard-list" id="leaderboard-list"></div>
+        <button class="clear-btn" id="clear-leaderboard">🗑️ Xóa tất cả</button>
       </div>
     </div>
 
-    <img src="imgs/ground.png" class="ground" data-ground alt="ground">
-    <img src="imgs/ground.png" class="ground" data-ground alt="ground">
-    <img src="imgs/dino-stationary.png" class="dino" data-dino alt="dino">
-  </div>
-
-  <!-- Loading Screen -->
-  <div class="loading-screen" data-loading-screen>
-    <div class="loading-content">
-      <div class="loading-logo">
-        <div class="loading-dino"></div>
-        <div class="loading-ground"></div>
+    <!-- Settings Modal -->
+    <div class="modal" id="settings-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>⚙️ CÀI ĐẶT</h2>
+          <button class="close-btn" id="close-settings">✕</button>
+        </div>
+        <div class="settings-list">
+          <div class="setting-item">
+            <span>🔊 Âm thanh</span>
+            <label class="toggle">
+              <input type="checkbox" id="sound-toggle" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="setting-item">
+            <span>🌙 Chế độ tối</span>
+            <label class="toggle">
+              <input type="checkbox" id="dark-toggle">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="setting-item">
+            <span>✨ Hiệu ứng</span>
+            <label class="toggle">
+              <input type="checkbox" id="effects-toggle" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="setting-item">
+            <span>📷 Chất lượng</span>
+            <select id="quality-select">
+              <option value="low">Thấp</option>
+              <option value="medium" selected>Trung bình</option>
+              <option value="high">Cao</option>
+              <option value="ultra">Cực cao</option>
+            </select>
+          </div>
+        </div>
       </div>
-      <h2 class="loading-title">Đang Tải...</h2>
-      <div class="loading-bar">
-        <div class="loading-progress" data-loading-progress></div>
-        <div class="loading-glow"></div>
-      </div>
-      <p class="loading-tip">💡 Mẹo: Giữ SPACE để nhảy cao hơn!</p>
     </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
   </div>
 
-  <!-- Toast Notification -->
-  <div class="toast-container" data-toast-container></div>
-
-  <script>
-    // Create animated particles for background
-    document.addEventListener('DOMContentLoaded', () => {
-      const particlesContainer = document.getElementById('particles');
-      if (particlesContainer) {
-        for (let i = 0; i < 50; i++) {
-          const particle = document.createElement('div');
-          particle.className = 'particle';
-          particle.style.cssText = `
-            left: ${Math.random() * 100}%;
-            animation-delay: ${Math.random() * 20}s;
-            animation-duration: ${15 + Math.random() * 10}s;
-          `;
-          particlesContainer.appendChild(particle);
-        }
-      }
-    });
-  </script>
+  <!-- Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  
+  <!-- Game Script -->
+  <script src="game3d.js"></script>
 </body>
 </html>
