@@ -10,11 +10,11 @@ const CONFIG = {
   groundLength: 200,
   laneWidth: 3,
   
-  // Dino - balanced size for gameplay
-  dinoSize: 1.5,
-  jumpHeight: 4,
-  jumpDuration: 650,
-  gravity: 0.016,
+  // Dino - small for playability
+  dinoSize: 0.8,
+  jumpHeight: 3,
+  jumpDuration: 600,
+  gravity: 0.014,
   
   // Game
   baseSpeed: 0.15,
@@ -24,11 +24,11 @@ const CONFIG = {
   powerupInterval: { min: 5000, max: 15000 },
   
   // Visual
-  fogNear: 35,
-  fogFar: 90,
-  cameraHeight: 4,
-  cameraDistance: 10,
-  cameraFOV: 65,
+  fogNear: 30,
+  fogFar: 80,
+  cameraHeight: 3,
+  cameraDistance: 8,
+  cameraFOV: 60,
 };
 
 // ==================== GAME STATE ====================
@@ -254,8 +254,8 @@ function createDino() {
   // Create a detailed T-Rex style dino
   const dinoGroup = new THREE.Group();
   
-  // Scale factor - balanced for gameplay
-  const scale = 1.5;
+  // Scale factor - small for playability
+  const scale = 0.8;
   
   // Main body material
   const bodyMaterial = new THREE.MeshStandardMaterial({
@@ -593,7 +593,7 @@ function createObstacle() {
 
 function createCactusObstacle() {
   const group = new THREE.Group();
-  const scale = 1.5; // Balanced obstacle scale
+  const scale = 1; // Small obstacle scale
   
   // Main stem
   const stemGeometry = new THREE.CylinderGeometry(0.4 * scale, 0.5 * scale, 3 * scale, 8);
@@ -642,7 +642,7 @@ function createCactusObstacle() {
 
 function createRockObstacle() {
   const group = new THREE.Group();
-  const scale = 1.5; // Balanced obstacle scale
+  const scale = 1; // Small obstacle scale
   
   // Main rock (icosahedron for rough look)
   const rockGeometry = new THREE.IcosahedronGeometry(1.2 * scale, 0);
@@ -677,7 +677,7 @@ function createRockObstacle() {
 
 function createCrystalObstacle() {
   const group = new THREE.Group();
-  const scale = 1.5; // Balanced obstacle scale
+  const scale = 1; // Small obstacle scale
   
   // Crystal (octahedron)
   const crystalGeometry = new THREE.OctahedronGeometry(0.9 * scale, 0);
@@ -735,7 +735,7 @@ function createPowerup() {
   }
   
   const group = new THREE.Group();
-  const scale = 1.3; // Balanced powerup scale
+  const scale = 1; // Small powerup scale
   
   // Main sphere
   const sphereGeometry = new THREE.OctahedronGeometry(0.6 * scale, 2);
@@ -771,7 +771,7 @@ function createPowerup() {
   const glow = new THREE.Mesh(glowGeometry, glowMaterial);
   group.add(glow);
   
-  group.position.set(0, 2, -CONFIG.groundLength / 2);
+  group.position.set(0, 1.5, -CONFIG.groundLength / 2);
   group.userData.type = 'powerup';
   group.userData.powerupType = type;
   
@@ -933,7 +933,7 @@ function updatePowerups(delta) {
     
     // Rotate and float
     powerup.rotation.y += 0.03;
-    powerup.position.y = 2 + Math.sin(Date.now() * 0.005) * 0.4;
+    powerup.position.y = 1.5 + Math.sin(Date.now() * 0.005) * 0.3;
     
     // Remove if past camera
     if (powerup.position.z > 10) {
@@ -973,11 +973,11 @@ function updateVisuals(delta) {
 function checkCollisions() {
   if (state.isInvincible) return;
   
-  // Create smaller hitbox for fairness
+  // Create hitbox
   const dinoBox = new THREE.Box3().setFromObject(dino);
-  // Shrink hitbox for fair gameplay
-  dinoBox.min.add(new THREE.Vector3(0.8, 0.3, 0.8));
-  dinoBox.max.sub(new THREE.Vector3(0.8, 0.3, 0.8));
+  // Shrink hitbox slightly for fair gameplay
+  dinoBox.min.add(new THREE.Vector3(0.3, 0.1, 0.3));
+  dinoBox.max.sub(new THREE.Vector3(0.3, 0.1, 0.3));
   
   // Check obstacles
   for (const obstacle of obstacles) {
