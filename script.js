@@ -1,604 +1,628 @@
-// Commit 27: Thêm comment nhỏ tiếp tục tăng số lượng commit
+/**
+ * DINO RUNNER - Main Game Script
+ * Refactored for cleaner code and better performance
+ */
+
 import { updateGround, setupGround } from "./ground.js"
-import { updateDino, setupDino, getDinoRect, setDinoLose, removeDinoJumpClass } from "./dino.js"
+import { updateDino, setupDino, getDinoRect, setDinoLose, setDinoInvincible } from "./dino.js"
 import { updateCactus, setupCactus, getCactusRects } from "./cactus.js"
 import { updatePowerup, setupPowerup, getIsInvincible, activateInvincibility } from "./powerup.js"
 import { updateBoss, setupBoss, getBossRect, isBossActive, getBossProjectiles } from "./boss.js"
 
-const WORLD_WIDTH = 100 // Chiều rộng thế giới game (đơn vị ảo)
-// Định nghĩa chiều cao thế giới game (đơn vị ảo)
-const WORLD_HEIGHT = 30 // Chiều cao thế giới game (đơn vị ảo)
-const SPEED_SCALE_INCREASE = 0.000002 // Tốc độ tăng dần của game
+// ==================== CONSTANTS ====================
+const WORLD_WIDTH = 100
+const WORLD_HEIGHT = 30
+const SPEED_SCALE_INCREASE = 0.000002
+const SPEED_BOOST_INTERVAL_MS = 30000
+const SPEED_BOOST_SCORE = 500
+const SPEED_BOOST_AMOUNT = 0.05
+const COMBO_REQUIRE = 3
+const COMBO_BONUS = 100
+const TIME_ATTACK_DURATION = 30000
 
-// DOM Elements
-const worldElem = document.querySelector("[data-world]")
-const scoreElem = document.querySelector("[data-score]")
-const startScreenElem = document.querySelector("[data-start-screen]")
-const highScoreElem = document.querySelector("[data-high-score]")
-const comboElem = document.querySelector('[data-combo]') // Hiển thị combo trên UI
+// ==================== DOM ELEMENTS ====================
+const $ = (selector) => document.querySelector(selector)
+const $$ = (selector) => document.querySelectorAll(selector)
 
-// Menu Elements
-const mainMenuElem = document.querySelector("[data-main-menu]")
-const playBtn = document.querySelector("[data-play-btn]")
-const instructionsBtn = document.querySelector("[data-instructions-btn]")
-const leaderboardBtn = document.querySelector("[data-leaderboard-btn]")
-const settingsBtn = document.querySelector("[data-settings-btn]")
-
-// Modal Elements
-const instructionsModal = document.querySelector("[data-instructions-modal]")
-const leaderboardModal = document.querySelector("[data-leaderboard-modal]")
-const settingsModal = document.querySelector("[data-settings-modal]")
-const gameoverModal = document.querySelector("[data-gameover-modal]")
-const pauseMenu = document.querySelector("[data-pause-menu]")
-
-// Game Over Elements
-const finalScoreElem = document.querySelector("[data-final-score]")
-const finalHighscoreElem = document.querySelector("[data-final-highscore]")
-const finalComboElem = document.querySelector("[data-final-combo]")
-const restartBtn = document.querySelector("[data-restart-btn]")
-const mainMenuBtn = document.querySelector("[data-main-menu-btn]")
-
-// Pause Elements
-const pauseBtn = document.querySelector("[data-pause-btn]")
-const resumeBtn = document.querySelector("[data-resume-btn]")
-const pauseMainMenuBtn = document.querySelector("[data-pause-main-menu-btn]")
-
-// Settings Elements
-const soundToggle = document.querySelector("[data-sound-toggle]")
-const musicToggle = document.querySelector("[data-music-toggle]")
-const difficultySelect = document.querySelector("[data-difficulty-select]")
-const themeSelect = document.querySelector("[data-theme-select]")
-
-// Loading Elements
-const loadingScreen = document.querySelector("[data-loading-screen]")
-const loadingProgress = document.querySelector("[data-loading-progress]")
-
-// Audio
-const hitSound = new Audio("imgs/hit.wav") // Âm thanh khi va chạm chướng ngại vật
-// Biến lưu nhạc nền của game
-let backgroundMusic = null // Nhạc nền của game
-let isMuted = false // Trạng thái tắt/bật âm thanh
-
-// Âm thanh vật phẩm
-const soundPowerupInv = new Audio('imgs/powerup-inv.wav') // Âm thanh powerup bất tử
-// Âm thanh khi nhận powerup điểm số
-const soundPowerupScore = new Audio('imgs/powerup-score.wav') // Âm thanh powerup điểm số
-const soundPowerupJump = new Audio('imgs/powerup-jump.wav') // Âm thanh powerup nhảy cao
-// Âm thanh khi đổi chế độ chơi
-const soundModeChange = new Audio('imgs/mode-change.wav') // Âm thanh khi đổi chế độ chơi
-
-// Xử lý lỗi audio
-const audioElements = [hitSound, soundPowerupInv, soundPowerupScore, soundPowerupJump, soundModeChange] // Danh sách các audio để kiểm tra lỗi
-audioElements.forEach(audio => {
-  audio.addEventListener('error', () => {
-    console.log('Audio file not found, continuing without sound')
-  })
-})
-
-// Game State
-let lastTime // Thời gian frame cuối cùng
-let speedScale = 1 // Tốc độ hiện tại của game
-let speedScaleTarget = 1 // Tốc độ mục tiêu của game
-const SPEED_SCALE_SMOOTH_STEP = 0.01 // Bước tăng mượt cho tốc độ game
-let score = 0 // Điểm số hiện tại của người chơi
-let highScore = Number(localStorage.getItem("highScore")) || 0 // Lưu high score của người chơi
-let maxCombo = 0 // Combo lớn nhất đạt được trong game
-let isPaused = false // Trạng thái tạm dừng game
-let isGameRunning = false // Trạng thái game đang chạy hay không
-let bossPause = false // Trạng thái tạm dừng khi boss xuất hiện
-
-// Đối tượng lưu trữ cài đặt game: âm thanh, nhạc, độ khó, theme
-let gameSettings = {
-  soundEnabled: true,
-  musicEnabled: false,
-  difficulty: 'normal',
-  theme: 'default'
+const elements = {
+  world: $("[data-world]"),
+  score: $("[data-score]"),
+  startScreen: $("[data-start-screen]"),
+  highScore: $("[data-high-score]"),
+  combo: $("[data-combo]"),
+  mainMenu: $("[data-main-menu]"),
+  timer: $("[data-timer]"),
+  timerValue: $("[data-timer-value]"),
+  
+  // Buttons
+  playBtn: $("[data-play-btn]"),
+  instructionsBtn: $("[data-instructions-btn]"),
+  leaderboardBtn: $("[data-leaderboard-btn]"),
+  settingsBtn: $("[data-settings-btn]"),
+  
+  // Modals
+  instructionsModal: $("[data-instructions-modal]"),
+  leaderboardModal: $("[data-leaderboard-modal]"),
+  settingsModal: $("[data-settings-modal]"),
+  gameoverModal: $("[data-gameover-modal]"),
+  pauseMenu: $("[data-pause-menu]"),
+  
+  // Game over
+  finalScore: $("[data-final-score]"),
+  finalHighscore: $("[data-final-highscore]"),
+  finalCombo: $("[data-final-combo]"),
+  gameoverMessage: $("[data-gameover-message]"),
+  restartBtn: $("[data-restart-btn]"),
+  mainMenuBtn: $("[data-main-menu-btn]"),
+  
+  // Pause
+  pauseBtn: $("[data-pause-btn]"),
+  resumeBtn: $("[data-resume-btn]"),
+  pauseMainMenuBtn: $("[data-pause-main-menu-btn]"),
+  
+  // Settings
+  soundToggle: $("[data-sound-toggle]"),
+  musicToggle: $("[data-music-toggle]"),
+  difficultySelect: $("[data-difficulty-select]"),
+  themeSelect: $("[data-theme-select]"),
+  
+  // Loading
+  loadingScreen: $("[data-loading-screen]"),
+  loadingProgress: $("[data-loading-progress]"),
+  
+  // Others
+  leaderboardList: $("[data-leaderboard-list]"),
+  muteBtn: $("[data-mute-btn]"),
+  dino: $("[data-dino]"),
+  startHighScore: $("[data-start-high-score]"),
 }
 
-// Load settings from localStorage
-loadSettings()
-
-// Speed boost variables
-const SPEED_BOOST_INTERVAL_MS = 30000 // Khoảng thời gian tăng tốc (30 giây)
-const SPEED_BOOST_SCORE = 500 // Điểm số cần để tăng tốc
-const SPEED_BOOST_AMOUNT = 0.05 // Lượng tăng tốc độ mỗi lần
-let lastSpeedBoostTime = 0 // Thời gian tăng tốc cuối cùng
-let lastSpeedBoostScore = 0 // Điểm số khi tăng tốc cuối cùng
-
-// Combo system
-let comboCount = 0 // Số lượng combo hiện tại
-let lastObstaclePassed = null // Chướng ngại vật cuối cùng đã vượt qua
-let comboTimeout = null // Timeout để reset combo
-const COMBO_REQUIRE = 3 // Số chướng ngại vật cần để được combo
-const COMBO_BONUS = 100 // Số điểm thưởng khi đạt combo
-
-// Jump power
-let jumpPower = 1 // Sức bật nhảy hiện tại của dino
-const DEFAULT_JUMP_POWER = 1 // Sức bật nhảy mặc định
-const BOOSTED_JUMP_POWER = 1.7 // Sức bật nhảy khi nhận power-up
-const JUMP_BOOST_DURATION = 5000 // Thời gian hiệu lực powerup nhảy cao (ms)
-let jumpBoostTimeout = null // Timeout cho hiệu ứng powerup nhảy cao
-window.jumpPower = jumpPower
-
-window.addEventListener("powerup:score", () => {
-  // Nhận powerup điểm số, cộng thêm 200 điểm
-  score += 200
-  scoreElem.textContent = Math.floor(score)
-  try {
-    soundPowerupScore.currentTime = 0; soundPowerupScore.play()
-  } catch (e) {
-    console.log('Could not play sound effect')
-  }
-})
-
-window.addEventListener("powerup:jump", () => {
-  // Nhận powerup nhảy cao
-  jumpPower = BOOSTED_JUMP_POWER
-  window.jumpPower = jumpPower
-  if (jumpBoostTimeout) clearTimeout(jumpBoostTimeout)
-  jumpBoostTimeout = setTimeout(() => {
-    jumpPower = DEFAULT_JUMP_POWER
-    window.jumpPower = jumpPower
-  }, JUMP_BOOST_DURATION)
-  try {
-    soundPowerupJump.currentTime = 0; soundPowerupJump.play()
-  } catch (e) {
-    console.log('Could not play sound effect')
-  }
-})
-
-window.addEventListener("powerup:invincibility", () => {
-  // Nhận powerup bất tử
-  try {
-    soundPowerupInv.currentTime = 0; soundPowerupInv.play()
-  } catch (e) {
-    console.log('Could not play sound effect')
-  }
-})
-
-// Phát âm thanh khi đổi chế độ chơi
-const modeBtns = document.querySelectorAll('.mode-btn')
-modeBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
-    try {
-      soundModeChange.currentTime = 0; soundModeChange.play()
-    } catch (e) {
-      console.log('Could not play sound effect')
+// ==================== AUDIO ====================
+class AudioManager {
+  constructor() {
+    this.sounds = {
+      hit: this.createAudio("imgs/hit.wav"),
+      jump: this.createAudio("imgs/jump.wav"),
+      powerupInv: this.createAudio("imgs/powerup-inv.wav"),
+      powerupScore: this.createAudio("imgs/powerup-score.wav"),
+      powerupJump: this.createAudio("imgs/powerup-jump.wav"),
+      modeChange: this.createAudio("imgs/mode-change.wav"),
     }
-  })
-})
+    this.isMuted = false
+  }
+  
+  createAudio(src) {
+    const audio = new Audio(src)
+    audio.addEventListener('error', () => {
+      console.log(`Audio file not found: ${src}`)
+    })
+    return audio
+  }
+  
+  play(soundName) {
+    if (this.isMuted || !gameState.settings.soundEnabled) return
+    
+    const sound = this.sounds[soundName]
+    if (sound) {
+      try {
+        sound.currentTime = 0
+        sound.play()
+      } catch (e) {
+        console.log('Could not play sound')
+      }
+    }
+  }
+  
+  toggleMute() {
+    this.isMuted = !this.isMuted
+    elements.muteBtn.querySelector('span').textContent = this.isMuted ? '🔇' : '🔊'
+  }
+}
 
-let selectedMode = localStorage.getItem('selectedMode') || 'classic'; // Chế độ chơi được chọn
+const audioManager = new AudioManager()
 
-// Initialize the game
-init()
+// ==================== GAME STATE ====================
+const gameState = {
+  lastTime: null,
+  speedScale: 1,
+  speedScaleTarget: 1,
+  score: 0,
+  highScore: Number(localStorage.getItem("highScore")) || 0,
+  maxCombo: 0,
+  isPaused: false,
+  isRunning: false,
+  bossPause: false,
+  
+  // Speed boost
+  lastSpeedBoostTime: 0,
+  lastSpeedBoostScore: 0,
+  
+  // Combo system
+  comboCount: 0,
+  lastObstaclePassed: null,
+  comboTimeout: null,
+  
+  // Jump power
+  jumpPower: 1,
+  jumpBoostTimeout: null,
+  
+  // Game mode
+  selectedMode: localStorage.getItem('selectedMode') || 'classic',
+  selectedCharacter: localStorage.getItem('selectedCharacter') || 'green',
+  
+  // Time attack
+  timeAttackTime: TIME_ATTACK_DURATION,
+  
+  // Settings
+  settings: {
+    soundEnabled: true,
+    musicEnabled: false,
+    difficulty: 'normal',
+    theme: 'default',
+  },
+  
+  reset() {
+    this.lastTime = null
+    this.speedScale = 1
+    this.speedScaleTarget = 1
+    this.score = 0
+    this.maxCombo = 0
+    this.comboCount = 0
+    this.lastObstaclePassed = null
+    this.bossPause = false
+    this.isPaused = false
+    this.jumpPower = 1
+    this.lastSpeedBoostTime = 0
+    this.lastSpeedBoostScore = 0
+    this.timeAttackTime = TIME_ATTACK_DURATION
+    window.jumpPower = 1
+  }
+}
 
-// Khởi tạo game, hiển thị loading, thiết lập sự kiện, load leaderboard
+// Expose jump power to window for dino.js
+window.jumpPower = gameState.jumpPower
+
+// ==================== INITIALIZATION ====================
 function init() {
-  // Bắt đầu khởi tạo game
-  console.log('Initializing game...')
+  console.log('🦖 Initializing Dino Runner...')
+  loadSettings()
   showLoadingScreen()
   setupEventListeners()
   loadLeaderboard()
+  updateHighScoreDisplay()
+  
   setTimeout(() => {
     hideLoadingScreen()
     showMainMenu()
-    console.log('Game initialized successfully')
+    console.log('✅ Game initialized successfully')
   }, 2000)
 }
 
-// Hiển thị màn hình loading với thanh tiến trình giả lập
+// ==================== LOADING SCREEN ====================
 function showLoadingScreen() {
-  // Hiển thị loading screen (commit 28)
-  loadingScreen.style.display = 'flex'
+  elements.loadingScreen.style.display = 'flex'
   let progress = 0
-  const interval = setInterval(() => {
-    progress += Math.random() * 30
-    if (progress > 100) progress = 100
-    loadingProgress.style.width = `${progress}%`
-    if (progress >= 100) {
-      clearInterval(interval)
-    }
-  }, 100)
-}
-
-// Ẩn màn hình loading
-function hideLoadingScreen() {
-  // Ẩn loading screen (commit 29)
-  loadingScreen.style.display = 'none'
-}
-
-// Thiết lập các sự kiện cho nút menu, bàn phím, v.v.
-function setupEventListeners() {
-  // Thiết lập sự kiện cho các nút menu (commit 30)
-  playBtn.addEventListener('click', () => {
-    console.log('Play button clicked');
-    startGame();
-  })
-  instructionsBtn.addEventListener('click', () => {
-    console.log('Instructions button clicked');
-    showModal(instructionsModal);
-  })
-  leaderboardBtn.addEventListener('click', () => {
-    console.log('Leaderboard button clicked');
-    showModal(leaderboardModal);
-  })
-  settingsBtn.addEventListener('click', () => {
-    console.log('Settings button clicked');
-    showModal(settingsModal);
-  })
-
-  // Close buttons
-  document.querySelector("[data-close-instructions]").addEventListener('click', () => hideModal(instructionsModal))
-  document.querySelector("[data-close-leaderboard]").addEventListener('click', () => hideModal(leaderboardModal))
-  document.querySelector("[data-close-settings]").addEventListener('click', () => hideModal(settingsModal))
-
-  // Game over buttons
-  restartBtn.addEventListener('click', restartGame)
-  mainMenuBtn.addEventListener('click', showMainMenu)
-  pauseMainMenuBtn.addEventListener('click', showMainMenu)
-
-  // Pause buttons
-  // Thiết lập sự kiện cho nút tạm dừng và tiếp tục
-  pauseBtn.addEventListener('click', togglePause)
-  resumeBtn.addEventListener('click', togglePause)
-
-  // Settings
-  // Thiết lập sự kiện cho các tuỳ chọn cài đặt
-  soundToggle.addEventListener('change', updateSettings)
-  musicToggle.addEventListener('change', updateSettings)
-  difficultySelect.addEventListener('change', updateSettings)
-  themeSelect.addEventListener('change', updateSettings)
-
-  // Clear leaderboard
-  document.querySelector("[data-clear-leaderboard]").addEventListener('click', clearLeaderboard)
-
-  // Reset high score
-  document.querySelector('[data-reset-highscore]').addEventListener('click', () => {
-    localStorage.removeItem('highScore');
-    highScore = 0;
-    highScoreElem.textContent = 'High Score: 0';
-    // Cập nhật high score ở các nơi khác nếu cần
-    const allHighScoreElems = document.querySelectorAll('[data-high-score], [data-final-highscore]');
-    allHighScoreElems.forEach(e => e.textContent = 'High Score: 0');
-    alert('High score has been reset!');
-  });
-
-  // Thêm sự kiện bàn phím để điều khiển game
-  document.addEventListener('keydown', handleKeyPress)
   
-  // Thêm sự kiện click để bắt đầu game
-  startScreenElem.addEventListener('click', startGame);
-  const startContentElem = document.querySelector('.start-content');
-  if (startContentElem) {
-    startContentElem.addEventListener('click', startGame);
-  }
+  const interval = setInterval(() => {
+    progress += Math.random() * 25 + 5
+    if (progress > 100) progress = 100
+    elements.loadingProgress.style.width = `${progress}%`
+    
+    if (progress >= 100) clearInterval(interval)
+  }, 150)
+}
 
-  const characterBtns = document.querySelectorAll('.character-btn')
-  let selectedCharacter = localStorage.getItem('selectedCharacter') || 'green'
+function hideLoadingScreen() {
+  elements.loadingScreen.style.display = 'none'
+}
 
+// ==================== EVENT LISTENERS ====================
+function setupEventListeners() {
+  // Menu buttons
+  elements.playBtn?.addEventListener('click', startGame)
+  elements.instructionsBtn?.addEventListener('click', () => showModal(elements.instructionsModal))
+  elements.leaderboardBtn?.addEventListener('click', () => showModal(elements.leaderboardModal))
+  elements.settingsBtn?.addEventListener('click', () => showModal(elements.settingsModal))
+  
+  // Close buttons
+  $("[data-close-instructions]")?.addEventListener('click', () => hideModal(elements.instructionsModal))
+  $("[data-close-leaderboard]")?.addEventListener('click', () => hideModal(elements.leaderboardModal))
+  $("[data-close-settings]")?.addEventListener('click', () => hideModal(elements.settingsModal))
+  
+  // Game over buttons
+  elements.restartBtn?.addEventListener('click', restartGame)
+  elements.mainMenuBtn?.addEventListener('click', showMainMenu)
+  elements.pauseMainMenuBtn?.addEventListener('click', showMainMenu)
+  
+  // Pause buttons
+  elements.pauseBtn?.addEventListener('click', togglePause)
+  elements.resumeBtn?.addEventListener('click', togglePause)
+  
+  // Mute button
+  elements.muteBtn?.addEventListener('click', () => audioManager.toggleMute())
+  
+  // Settings
+  elements.soundToggle?.addEventListener('change', updateSettings)
+  elements.musicToggle?.addEventListener('change', updateSettings)
+  elements.difficultySelect?.addEventListener('change', updateSettings)
+  elements.themeSelect?.addEventListener('change', updateSettings)
+  
+  // Leaderboard
+  $("[data-clear-leaderboard]")?.addEventListener('click', clearLeaderboard)
+  $("[data-reset-highscore]")?.addEventListener('click', resetHighScore)
+  
+  // Keyboard events
+  document.addEventListener('keydown', handleKeyDown)
+  
+  // Start screen click
+  elements.startScreen?.addEventListener('click', handleStart)
+  
+  // Character selection
+  setupCharacterSelection()
+  
+  // Mode selection
+  setupModeSelection()
+  
+  // Modal overlay clicks
+  $$('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        hideModal(overlay.closest('.modal'))
+      }
+    })
+  })
+  
+  // Powerup events
+  window.addEventListener("powerup:score", handleScorePowerup)
+  window.addEventListener("powerup:jump", handleJumpPowerup)
+  window.addEventListener("powerup:invincibility", handleInvincibilityPowerup)
+}
+
+function setupCharacterSelection() {
+  const characterBtns = $$('.character-btn')
+  
   characterBtns.forEach(btn => {
-    // Sự kiện chọn nhân vật
+    if (btn.dataset.character === gameState.selectedCharacter) {
+      btn.classList.add('selected')
+    }
+    
     btn.addEventListener('click', () => {
-      selectedCharacter = btn.dataset.character
-      localStorage.setItem('selectedCharacter', selectedCharacter)
       characterBtns.forEach(b => b.classList.remove('selected'))
       btn.classList.add('selected')
+      gameState.selectedCharacter = btn.dataset.character
+      localStorage.setItem('selectedCharacter', gameState.selectedCharacter)
     })
-    if (btn.dataset.character === selectedCharacter) {
+  })
+}
+
+function setupModeSelection() {
+  const modeBtns = $$('.mode-btn')
+  
+  modeBtns.forEach(btn => {
+    if (btn.dataset.mode === gameState.selectedMode) {
       btn.classList.add('selected')
     }
-  })
-
-  const modeBtns = document.querySelectorAll('.mode-btn')
-  modeBtns.forEach(btn => {
-    // Sự kiện chọn chế độ chơi
+    
     btn.addEventListener('click', () => {
-      selectedMode = btn.dataset.mode
-      localStorage.setItem('selectedMode', selectedMode)
       modeBtns.forEach(b => b.classList.remove('selected'))
       btn.classList.add('selected')
+      gameState.selectedMode = btn.dataset.mode
+      localStorage.setItem('selectedMode', gameState.selectedMode)
+      audioManager.play('modeChange')
     })
-    if (btn.dataset.mode === selectedMode) {
-      btn.classList.add('selected')
-    }
   })
 }
 
-// Xử lý sự kiện bàn phím cho các phím điều khiển game
-function handleKeyPress(event) {
-  // Xử lý phím Space để bắt đầu game khi chưa chạy
-  if (event.code === 'Space' && !isGameRunning) {
-    event.preventDefault() // Ngăn không cho trình duyệt cuộn trang
-    startGame() // Bắt đầu game khi nhấn Space
-  } else if (event.code === 'Escape' && isGameRunning) {
-    event.preventDefault() // Ngăn không cho trình duyệt xử lý phím Esc
-    togglePause() // Tạm dừng/tiếp tục game khi nhấn Esc
+// ==================== KEYBOARD HANDLING ====================
+function handleKeyDown(e) {
+  if (e.code === 'Space') {
+    e.preventDefault()
+    if (!gameState.isRunning) {
+      if (elements.mainMenu.style.display !== 'none') {
+        startGame()
+      } else if (!elements.startScreen.classList.contains('hide')) {
+        handleStart()
+      }
+    }
+  } else if (e.code === 'Escape' && gameState.isRunning) {
+    e.preventDefault()
+    togglePause()
   }
 }
 
-// Xử lý sự kiện chạm màn hình cho thiết bị di động cảm ứng
-function handleTouchStart(event) {
-  // Khi chạm màn hình khi game chưa chạy thì bắt đầu game
-  if (event.code === 'Space' && !isGameRunning) {
-    event.preventDefault() // Ngăn hành vi mặc định của trình duyệt
-    startGame() // Bắt đầu game khi chạm màn hình
-  } else if (event.code === 'Escape' && isGameRunning) {
-    event.preventDefault() // Ngăn hành vi mặc định 
-    togglePause() // Tạm dừng/tiếp tục game khi chạm nút tạm dừng
-  }
+// ==================== POWERUP HANDLERS ====================
+function handleScorePowerup() {
+  gameState.score += 200
+  elements.score.textContent = Math.floor(gameState.score)
+  audioManager.play('powerupScore')
+  showToast('💰 +200 Điểm!', 'success')
 }
 
-// Hiển thị menu chính và đặt lại trạng thái game
+function handleJumpPowerup() {
+  gameState.jumpPower = 1.7
+  window.jumpPower = gameState.jumpPower
+  
+  if (gameState.jumpBoostTimeout) clearTimeout(gameState.jumpBoostTimeout)
+  gameState.jumpBoostTimeout = setTimeout(() => {
+    gameState.jumpPower = 1
+    window.jumpPower = 1
+  }, 5000)
+  
+  audioManager.play('powerupJump')
+  showToast('🚀 Nhảy Cao!', 'success')
+}
+
+function handleInvincibilityPowerup() {
+  audioManager.play('powerupInv')
+  showToast('🛡️ Bất Tử!', 'success')
+}
+
+// ==================== MENU & MODALS ====================
 function showMainMenu() {
-  // Hiển thị menu chính và ẩn thế giới game
-  mainMenuElem.style.display = 'flex' // Hiển thị menu chính
-  worldElem.classList.remove('show') // Ẩn thế giới game
-  isGameRunning = false // Đặt trạng thái game về chưa chạy
-  resetGameState() // Đặt lại toàn bộ trạng thái game về mặc định
+  elements.mainMenu.style.display = 'flex'
+  elements.world.classList.remove('show')
+  gameState.isRunning = false
+  gameState.reset()
+  hideModal(elements.gameoverModal)
+  hideModal(elements.pauseMenu)
+  updateHighScoreDisplay()
 }
 
-// Bắt đầu trò chơi
+function showModal(modal) {
+  modal?.classList.add('show')
+}
+
+function hideModal(modal) {
+  modal?.classList.remove('show')
+}
+
+function showToast(message, type = 'success') {
+  const container = $('[data-toast-container]')
+  if (!container) return
+  
+  const toast = document.createElement('div')
+  toast.className = `toast ${type}`
+  toast.innerHTML = `
+    <span class="toast-icon">${type === 'success' ? '✅' : type === 'error' ? '❌' : '⚠️'}</span>
+    <span class="toast-message">${message}</span>
+  `
+  container.appendChild(toast)
+  
+  setTimeout(() => toast.remove(), 3000)
+}
+
+// ==================== GAME CONTROL ====================
 function startGame() {
-  // Bắt đầu trò chơi
-  console.log('Starting game...')
-  mainMenuElem.style.display = 'none'
-  worldElem.classList.add('show')
-  isGameRunning = true
-  resetGameState()
-
-  // Áp dụng logic từng chế độ
-  if (selectedMode === 'hard') {
-    speedScale = 1.5
-    speedScaleTarget = 1.5
-    // Có thể tăng tần suất chướng ngại vật ở các file khác nếu muốn
-  } else if (selectedMode === 'endless') {
-    speedScale = 1
-    speedScaleTarget = 1
-    // Không tăng tốc độ trong updateSpeedScale
-    window.isEndlessMode = true
-  } else if (selectedMode === 'time') {
-    speedScale = 1
-    speedScaleTarget = 1
-    window.isTimeAttack = true
-    window.timeAttackTime = 30000 // 30 giây
-  } else {
-    speedScale = 1
-    speedScaleTarget = 1
-    window.isEndlessMode = false
-    window.isTimeAttack = false
-  }
-
-  // Start background music if enabled
-  if (gameSettings.musicEnabled && !isMuted) {
-    startBackgroundMusic()
-  }
-
-  handleStart()
-  console.log('Game started successfully')
-}
-
-// Đặt lại trạng thái game về mặc định khi bắt đầu hoặc kết thúc
-function resetGameState() {
-  // Đặt lại các biến trạng thái game về mặc định
-  lastTime = null
-  speedScale = 1
-  speedScaleTarget = 1
-  score = 0                                                                       
-  maxCombo = 0                                                                        
-  comboCount = 0                                                                        
-  lastObstaclePassed = null                                                                       
-  bossPause = false
-  isPaused = false
+  console.log('🎮 Starting game...')
+  elements.mainMenu.style.display = 'none'
+  elements.world.classList.add('show')
+  gameState.isRunning = true
+  gameState.reset()
   
-  // Reset UI
-  scoreElem.textContent = '0'
-  comboElem.textContent = ''
-  pauseMenu.classList.remove('show')
+  // Apply mode settings
+  applyGameMode()
   
-  // Thiết lập lại các thành phần game
+  // Update UI
+  updateHighScoreDisplay()
+  elements.score.textContent = '0'
+  elements.combo.textContent = ''
+  
+  // Setup game elements
   setupGround()
   setupDino()
   setupCactus()
   setupPowerup()
   setupBoss()
   
-  document.querySelector('[data-dino]').style.filter = ''
+  // Reset dino effects
+  setDinoInvincible(false)
+  
+  console.log('✅ Game started!')
 }
 
-// Chuyển đổi trạng thái tạm dừng game
-function togglePause() {
-  // Chuyển đổi trạng thái tạm dừng game
-  if (!isGameRunning) return
+function applyGameMode() {
+  const mode = gameState.selectedMode
   
-  isPaused = !isPaused
-  if (isPaused) {
-    pauseMenu.classList.add('show')
-  } else {
-    pauseMenu.classList.remove('show')
+  // Reset time attack timer
+  elements.timer.style.display = 'none'
+  
+  switch (mode) {
+    case 'hard':
+      gameState.speedScale = 1.5
+      gameState.speedScaleTarget = 1.5
+      break
+    case 'endless':
+      gameState.speedScale = 1
+      gameState.speedScaleTarget = 1
+      break
+    case 'time':
+      gameState.speedScale = 1.2
+      gameState.speedScaleTarget = 1.2
+      gameState.timeAttackTime = TIME_ATTACK_DURATION
+      elements.timer.style.display = 'flex'
+      updateTimerDisplay()
+      break
+    default:
+      gameState.speedScale = 1
+      gameState.speedScaleTarget = 1
   }
 }
 
-// Khởi động lại game sau khi thua hoặc từ menu tạm dừng
-function restartGame() {
-  // Khởi động lại game sau khi thua hoặc từ menu tạm dừng
-  hideModal(gameoverModal)  
-  startGame()
-}
-
-// Hiển thị modal (hộp thoại) truyền vào
-function showModal(modal) {
-  modal.classList.add('show')
-}
-
-// Ẩn modal (hộp thoại) truyền vào
-function hideModal(modal) {
-  modal.classList.remove('show')
-}x  
-
-// Hiển thị màn hình Game Over và cập nhật thống kê
-function showGameOver() {
-  finalScoreElem.textContent = Math.floor(score)
-  finalHighscoreElem.textContent = highScore
-  finalComboElem.textContent = maxCombo
-  
-  // Add to leaderboard
-  addToLeaderboard(Math.floor(score))
-  
-  showModal(gameoverModal)
-}
-
-// Cập nhật cài đặt game khi người dùng thay đổi
-function updateSettings() {
-  gameSettings.soundEnabled = soundToggle.checked
-  gameSettings.musicEnabled = musicToggle.checked
-  gameSettings.difficulty = difficultySelect.value
-  gameSettings.theme = themeSelect.value
-  
-  // Apply theme
-  document.body.className = `theme-${gameSettings.theme}`
-  
-  // Handle music
-  if (gameSettings.musicEnabled && isGameRunning && !isMuted) {
-    startBackgroundMusic()
-  } else {
-    stopBackgroundMusic()
-  }
-  
-  // Save settings
-  localStorage.setItem('gameSettings', JSON.stringify(gameSettings))
-}
-
-// Tải cài đặt game từ localStorage khi khởi động
-function loadSettings() {
-  const saved = localStorage.getItem('gameSettings')
-  if (saved) {
-    gameSettings = { ...gameSettings, ...JSON.parse(saved) }
-    
-    // Apply settings to UI
-    soundToggle.checked = gameSettings.soundEnabled
-    musicToggle.checked = gameSettings.musicEnabled
-    difficultySelect.value = gameSettings.difficulty
-    themeSelect.value = gameSettings.theme
-    
-    // Apply theme
-    document.body.className = `theme-${gameSettings.theme}`
-  }
-}
-
-// Bắt đầu phát nhạc nền nếu được bật
-function startBackgroundMusic() {
-  // Placeholder for background music
-  // In a real implementation, you would load and play background music here
-  console.log('Background music started')
-}
-
-// Dừng phát nhạc nền
-function stopBackgroundMusic() {
-  // Placeholder for stopping background music
-  console.log('Background music stopped')
-}
-
-// Tải bảng xếp hạng từ localStorage và hiển thị
-function loadLeaderboard() {
-  const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]')
-  const leaderboardList = document.querySelector("[data-leaderboard-list]")
-  leaderboardList.innerHTML = ''
-  
-  leaderboard.forEach((entry, index) => {
-    const item = document.createElement('div')
-    item.className = 'leaderboard-item'
-    item.innerHTML = `
-      <span class="leaderboard-rank">#${index + 1}</span>
-      <span>${entry.score}</span>
-      <span>${new Date(entry.date).toLocaleDateString()}</span>
-    `
-    leaderboardList.appendChild(item)
-  })
-}
-
-// Thêm điểm số mới vào bảng xếp hạng và lưu vào localStorage
-function addToLeaderboard(score) {
-  const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]')
-  leaderboard.push({
-    score: score,
-    date: new Date().toISOString()
-  })
-  
-  // Sort by score (highest first) and keep only top 10
-  leaderboard.sort((a, b) => b.score - a.score)
-  leaderboard.splice(10)
-  
-  localStorage.setItem('leaderboard', JSON.stringify(leaderboard))
-  loadLeaderboard()
-}
-
-// Xóa toàn bộ bảng xếp hạng khỏi localStorage
-function clearLeaderboard() {
-  localStorage.removeItem('leaderboard')
-  loadLeaderboard()
-}
-
-setPixelToWorldScale()
-window.addEventListener("resize", setPixelToWorldScale)
-
-// Vòng lặp chính cập nhật trạng thái game mỗi frame
-function update(time) {
-  if (lastTime == null) {
-    lastTime = time
-    lastSpeedBoostTime = time
-    window.requestAnimationFrame(update)
-    return
-  }
-  
-  if (isPaused || !isGameRunning) {
-    window.requestAnimationFrame(update)
-    return
-  }
-  
-  const delta = time - lastTime
-
-  updateGround(delta, speedScale)
-  updateDino(delta, speedScale)
-  if (!bossPause) {
-    updateCactus(delta, speedScale)
-    updatePowerup(delta, speedScale, () => {
-      activateInvincibility(() => {
-        document.querySelector('[data-dino]').style.filter = ''
-      })
-      document.querySelector('[data-dino]').style.filter = 'drop-shadow(0 0 16px yellow) brightness(1.3)';
-    })
-  }
-  updateBoss(delta, score, () => { bossPause = true }, () => { bossPause = false })
-  updateCombo()
-  updateSpeedScale(delta)
-  updateScore(delta)
-  checkSpeedBoost(time)
-  if (checkLose()) return handleLose()
-
-  lastTime = time
+function handleStart() {
+  gameState.lastTime = null
+  elements.startScreen.classList.add('hide')
   window.requestAnimationFrame(update)
 }
 
-// Kiểm tra các điều kiện dẫn đến thua game (va chạm với chướng ngại vật, boss, đạn)
-function checkLose() {
-  const dinoRect = shrinkRect(getDinoRect(), 5) // Lấy hình chữ nhật khung va chạm của khủng long
-  if (getIsInvincible()) return false // Nếu đang bất tử thì không thua
+function restartGame() {
+  hideModal(elements.gameoverModal)
+  startGame()
+  handleStart()
+}
+
+function togglePause() {
+  if (!gameState.isRunning) return
   
-  // Kiểm tra va chạm với boss
+  gameState.isPaused = !gameState.isPaused
+  elements.pauseMenu.classList.toggle('show', gameState.isPaused)
+}
+
+// ==================== GAME LOOP ====================
+function update(time) {
+  if (gameState.lastTime == null) {
+    gameState.lastTime = time
+    gameState.lastSpeedBoostTime = time
+    window.requestAnimationFrame(update)
+    return
+  }
+  
+  if (gameState.isPaused || !gameState.isRunning) {
+    window.requestAnimationFrame(update)
+    return
+  }
+  
+  const delta = time - gameState.lastTime
+  
+  // Update game elements
+  updateGround(delta, gameState.speedScale)
+  updateDino(delta, gameState.speedScale)
+  
+  if (!gameState.bossPause) {
+    updateCactus(delta, gameState.speedScale)
+    updatePowerup(delta, gameState.speedScale, handlePowerupCollected)
+  }
+  
+  updateBoss(
+    delta,
+    gameState.score,
+    () => { gameState.bossPause = true },
+    () => { gameState.bossPause = false }
+  )
+  
+  // Update game systems
+  updateCombo()
+  updateSpeedScale(delta, time)
+  updateScore(delta)
+  updateTimeAttack(delta)
+  
+  // Check lose condition
+  if (checkLose()) {
+    handleLose()
+    return
+  }
+  
+  gameState.lastTime = time
+  window.requestAnimationFrame(update)
+}
+
+function handlePowerupCollected() {
+  activateInvincibility(() => {
+    setDinoInvincible(false)
+  })
+  setDinoInvincible(true)
+}
+
+// ==================== GAME SYSTEMS ====================
+function updateScore(delta) {
+  gameState.score += delta * 0.01
+  elements.score.textContent = Math.floor(gameState.score)
+  
+  if (gameState.score > gameState.highScore) {
+    gameState.highScore = Math.floor(gameState.score)
+    updateHighScoreDisplay()
+    localStorage.setItem("highScore", gameState.highScore)
+  }
+}
+
+function updateSpeedScale(delta, time) {
+  if (gameState.selectedMode === 'endless') return
+  
+  // Smooth speed transition
+  if (gameState.speedScale < gameState.speedScaleTarget) {
+    gameState.speedScale = Math.min(
+      gameState.speedScale + 0.01,
+      gameState.speedScaleTarget
+    )
+  } else {
+    gameState.speedScale += delta * SPEED_SCALE_INCREASE
+  }
+  
+  // Speed boosts
+  if (time - gameState.lastSpeedBoostTime > SPEED_BOOST_INTERVAL_MS) {
+    gameState.speedScaleTarget += SPEED_BOOST_AMOUNT
+    gameState.lastSpeedBoostTime = time
+  }
+  
+  if (gameState.score - gameState.lastSpeedBoostScore > SPEED_BOOST_SCORE) {
+    gameState.speedScaleTarget += SPEED_BOOST_AMOUNT
+    gameState.lastSpeedBoostScore = gameState.score
+  }
+}
+
+function updateTimeAttack(delta) {
+  if (gameState.selectedMode !== 'time') return
+  
+  gameState.timeAttackTime -= delta
+  updateTimerDisplay()
+  
+  if (gameState.timeAttackTime <= 0) {
+    gameState.isRunning = false
+    showGameOver(true)
+  }
+}
+
+function updateTimerDisplay() {
+  const seconds = Math.max(0, Math.ceil(gameState.timeAttackTime / 1000))
+  elements.timerValue.textContent = seconds
+}
+
+function updateCombo() {
+  const obstacles = [...$$('[data-cactus]')]
+  const dinoRect = shrinkRect(getDinoRect(), 5)
+  let passed = false
+  
+  obstacles.forEach(obs => {
+    const rect = shrinkRect(obs.getBoundingClientRect(), 5)
+    if (rect.right < dinoRect.left && obs !== gameState.lastObstaclePassed) {
+      gameState.comboCount++
+      gameState.maxCombo = Math.max(gameState.maxCombo, gameState.comboCount)
+      gameState.lastObstaclePassed = obs
+      passed = true
+    }
+  })
+  
+  if (gameState.comboCount > 0 && gameState.comboCount % COMBO_REQUIRE === 0 && passed) {
+    gameState.score += COMBO_BONUS
+    showComboEffect(gameState.comboCount)
+  }
+}
+
+function showComboEffect(count) {
+  elements.combo.textContent = `🔥 COMBO x${count}! +${COMBO_BONUS}`
+  
+  if (gameState.comboTimeout) clearTimeout(gameState.comboTimeout)
+  gameState.comboTimeout = setTimeout(() => {
+    elements.combo.textContent = ''
+  }, 1500)
+}
+
+// ==================== COLLISION DETECTION ====================
+function checkLose() {
+  if (getIsInvincible()) return false
+  
+  const dinoRect = shrinkRect(getDinoRect(), 5)
+  
+  // Check boss collision
   const bossRect = getBossRect()
   if (bossRect && isBossActive() && isCollision(bossRect, dinoRect)) return true
   
-  // Kiểm tra va chạm với đạn của boss
+  // Check projectile collision
   if (getBossProjectiles().some(rect => isCollision(rect, dinoRect))) return true
   
-  // Kiểm tra va chạm với xương rồng
-  return (
-    getCactusRects().some(rect => isCollision(shrinkRect(rect, 5), dinoRect))
-  )
+  // Check cactus collision
+  return getCactusRects().some(rect => isCollision(shrinkRect(rect, 5), dinoRect))
 }
 
-// Kiểm tra va chạm giữa hai hình chữ nhật
 function isCollision(rect1, rect2) {
   return (
     rect1.left < rect2.right &&
@@ -608,7 +632,6 @@ function isCollision(rect1, rect2) {
   )
 }
 
-// Thu nhỏ hình chữ nhật theo một lượng nhất định
 function shrinkRect(rect, amount) {
   return {
     left: rect.left + amount,
@@ -618,135 +641,164 @@ function shrinkRect(rect, amount) {
   }
 }
 
-// Cập nhật tốc độ game dựa trên thời gian và chế độ chơi
-function updateSpeedScale(delta) {
-  if (window.isEndlessMode) {
-    speedScale = 1
-    speedScaleTarget = 1
+// ==================== GAME OVER ====================
+function handleLose() {
+  audioManager.play('hit')
+  setDinoLose()
+  gameState.isRunning = false
+  showGameOver(false)
+}
+
+function showGameOver(isTimeUp = false) {
+  const finalScore = Math.floor(gameState.score)
+  
+  elements.finalScore.textContent = finalScore
+  elements.finalHighscore.textContent = gameState.highScore
+  elements.finalCombo.textContent = gameState.maxCombo
+  
+  // Set message based on performance
+  const message = getGameOverMessage(finalScore, isTimeUp)
+  elements.gameoverMessage.textContent = message
+  
+  // Add to leaderboard
+  addToLeaderboard(finalScore)
+  
+  showModal(elements.gameoverModal)
+}
+
+function getGameOverMessage(score, isTimeUp) {
+  if (isTimeUp) {
+    return score > gameState.highScore 
+      ? '🎉 Kỷ lục mới! Tuyệt vời!' 
+      : '⏱️ Hết giờ! Thử lại nhé!'
+  }
+  
+  if (score >= 1000) return '🏆 Tuyệt vời! Bạn là cao thủ!'
+  if (score >= 500) return '⭐ Rất giỏi! Tiếp tục phát huy!'
+  if (score >= 200) return '👍 Khá tốt! Cố lên!'
+  return '💪 Đừng bỏ cuộc! Thử lại nhé!'
+}
+
+// ==================== LEADERBOARD ====================
+function loadLeaderboard() {
+  const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]')
+  
+  if (leaderboard.length === 0) {
+    elements.leaderboardList.innerHTML = `
+      <div class="empty-leaderboard">
+        <span class="empty-icon">🎮</span>
+        <p>Chưa có điểm số nào</p>
+        <p class="empty-hint">Hãy chơi game để ghi điểm!</p>
+      </div>
+    `
     return
   }
-  if (window.isTimeAttack) {
-    window.timeAttackTime -= delta
-    if (window.timeAttackTime <= 0) {
-      isGameRunning = false
-      showGameOver()
-      return
-    }
-  }
-  if (speedScale < speedScaleTarget) {
-    speedScale = Math.min(speedScale + SPEED_SCALE_SMOOTH_STEP, speedScaleTarget)
-  } else {
-    speedScale += delta * SPEED_SCALE_INCREASE
-  }
+  
+  elements.leaderboardList.innerHTML = leaderboard.map((entry, index) => `
+    <div class="leaderboard-item">
+      <span class="leaderboard-rank">${index + 1}</span>
+      <span class="leaderboard-score">${entry.score}</span>
+      <span class="leaderboard-date">${new Date(entry.date).toLocaleDateString('vi-VN')}</span>
+    </div>
+  `).join('')
 }
 
-// Cập nhật điểm số của người chơi mỗi frame
-function updateScore(delta) {
-  score += delta * 0.01
-  scoreElem.textContent = Math.floor(score)
-  if (score > highScore) {
-    highScore = Math.floor(score)
-    highScoreElem.textContent = `High Score: ${highScore}`
-    localStorage.setItem("highScore", highScore)
-  }
-}
-
-function checkSpeedBoost(time) {
-  // Kiểm tra và tăng tốc độ game theo thời gian và điểm số
-  if (time - lastSpeedBoostTime > SPEED_BOOST_INTERVAL_MS) {
-    speedScaleTarget += SPEED_BOOST_AMOUNT
-    lastSpeedBoostTime = time
-  }
-  if (score - lastSpeedBoostScore > SPEED_BOOST_SCORE) {
-    speedScaleTarget += SPEED_BOOST_AMOUNT
-    lastSpeedBoostScore = score
-  }
-}
-
-function updateCombo() {
-  const obstacles = [
-    ...document.querySelectorAll('[data-cactus]')
-  ]
-  const dinoRect = shrinkRect(getDinoRect(), 5)
-  let passed = false
-  obstacles.forEach(obs => {
-    const rect = shrinkRect(obs.getBoundingClientRect(), 5)
-    if (rect.right < dinoRect.left && obs !== lastObstaclePassed) {
-      comboCount++
-      maxCombo = Math.max(maxCombo, comboCount)
-      lastObstaclePassed = obs
-      passed = true
-    }
+function addToLeaderboard(score) {
+  const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]')
+  
+  leaderboard.push({
+    score,
+    date: new Date().toISOString()
   })
   
-  if (checkLose()) {
-    comboCount = 0
-    comboElem.textContent = ''
-    lastObstaclePassed = null
-    return
+  leaderboard.sort((a, b) => b.score - a.score)
+  leaderboard.splice(10)
+  
+  localStorage.setItem('leaderboard', JSON.stringify(leaderboard))
+  loadLeaderboard()
+}
+
+function clearLeaderboard() {
+  if (confirm('Bạn có chắc muốn xóa toàn bộ bảng xếp hạng?')) {
+    localStorage.removeItem('leaderboard')
+    loadLeaderboard()
+    showToast('🗑️ Đã xóa bảng xếp hạng!', 'warning')
+  }
+}
+
+function resetHighScore() {
+  if (confirm('Bạn có chắc muốn reset điểm cao nhất?')) {
+    localStorage.removeItem('highScore')
+    gameState.highScore = 0
+    updateHighScoreDisplay()
+    showToast('🔄 Đã reset high score!', 'warning')
+  }
+}
+
+// ==================== SETTINGS ====================
+function loadSettings() {
+  const saved = localStorage.getItem('gameSettings')
+  if (saved) {
+    gameState.settings = { ...gameState.settings, ...JSON.parse(saved) }
   }
   
-  if (comboCount > 0 && comboCount % COMBO_REQUIRE === 0 && passed) {
-    score += COMBO_BONUS
-    showComboEffect(comboCount)
+  // Apply to UI
+  if (elements.soundToggle) elements.soundToggle.checked = gameState.settings.soundEnabled
+  if (elements.musicToggle) elements.musicToggle.checked = gameState.settings.musicEnabled
+  if (elements.difficultySelect) elements.difficultySelect.value = gameState.settings.difficulty
+  if (elements.themeSelect) elements.themeSelect.value = gameState.settings.theme
+  
+  // Apply theme
+  applyTheme(gameState.settings.theme)
+}
+
+function updateSettings() {
+  gameState.settings = {
+    soundEnabled: elements.soundToggle?.checked ?? true,
+    musicEnabled: elements.musicToggle?.checked ?? false,
+    difficulty: elements.difficultySelect?.value ?? 'normal',
+    theme: elements.themeSelect?.value ?? 'default',
+  }
+  
+  applyTheme(gameState.settings.theme)
+  localStorage.setItem('gameSettings', JSON.stringify(gameState.settings))
+}
+
+function applyTheme(theme) {
+  document.body.className = theme === 'default' ? '' : `theme-${theme}`
+}
+
+// ==================== UI HELPERS ====================
+function updateHighScoreDisplay() {
+  const hsText = `High Score: ${gameState.highScore}`
+  
+  if (elements.highScore) {
+    const textEl = elements.highScore.querySelector('.hs-text')
+    if (textEl) textEl.textContent = hsText
+  }
+  
+  if (elements.startHighScore) {
+    elements.startHighScore.textContent = gameState.highScore
   }
 }
 
-function showComboEffect(count) {
-  // Hiển thị hiệu ứng combo và thông báo điểm thưởng
-  comboElem.textContent = `COMBO x${count}! +${COMBO_BONUS}`
-  if (comboTimeout) clearTimeout(comboTimeout)
-  comboTimeout = setTimeout(() => {
-    comboElem.textContent = ''
-  }, 1200)
-}
-
-function handleStart() {
-  lastTime = null
-  speedScale = 1
-  speedScaleTarget = 1
-  score = 0
-  highScoreElem.textContent = `High Score: ${highScore}`
-  lastSpeedBoostTime = 0
-  lastSpeedBoostScore = 0
-  setupGround()
-  setupDino()
-  setupCactus()
-  setupPowerup()
-  setupBoss()
-  document.querySelector('[data-dino]').style.filter = ''
-  comboCount = 0
-  comboElem.textContent = ''
-  lastObstaclePassed = null
-  bossPause = false
-  startScreenElem.classList.add("hide")
-  window.requestAnimationFrame(update)
-}
-
-function handleLose() {
-  // Phát âm thanh khi thua nếu được bật
-  if (gameSettings.soundEnabled && !isMuted) {
-    try {
-      hitSound.currentTime = 0
-      hitSound.play()
-    } catch (e) {
-      console.log('Could not play hit sound')
-    }
-  }
-  setDinoLose()
-  stopBackgroundMusic()
-  isGameRunning = false
-  showGameOver()
-}
-
+// ==================== WORLD SCALING ====================
 function setPixelToWorldScale() {
-    let worldToPixelScale
-  if (window.innerWidth / window.innerHeight < WORLD_WIDTH / WORLD_HEIGHT) {
+  const aspectRatio = WORLD_WIDTH / WORLD_HEIGHT
+  let worldToPixelScale
+  
+  if (window.innerWidth / window.innerHeight < aspectRatio) {
     worldToPixelScale = window.innerWidth / WORLD_WIDTH
   } else {
     worldToPixelScale = window.innerHeight / WORLD_HEIGHT
   }
-
-  worldElem.style.width = `${WORLD_WIDTH * worldToPixelScale}px`
-  worldElem.style.height = `${WORLD_HEIGHT * worldToPixelScale}px`
+  
+  elements.world.style.width = `${WORLD_WIDTH * worldToPixelScale}px`
+  elements.world.style.height = `${WORLD_HEIGHT * worldToPixelScale}px`
 }
+
+setPixelToWorldScale()
+window.addEventListener("resize", setPixelToWorldScale)
+
+// ==================== START GAME ====================
+init()

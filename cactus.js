@@ -1,39 +1,53 @@
-// Commit 23: Thêm comment nhỏ tiếp tục tăng số lượng commit
+/**
+ * DINO RUNNER - Cactus Obstacle Module
+ * Handles obstacle spawning and movement
+ */
+
 import {
   setCustomProperty,
   incrementCustomProperty,
   getCustomProperty,
-  isObstacleTooCloseByLeft,
 } from "./updateCustomProperty.js"
 
+// ==================== CONSTANTS ====================
 const SPEED = 0.05
 const CACTUS_INTERVAL_MIN = 800
 const CACTUS_INTERVAL_MAX = 2200
+const MIN_SPAWN_DISTANCE = 0.35 // 35% of world width
+
+// ==================== DOM ELEMENTS ====================
 const worldElem = document.querySelector("[data-world]")
 
-let nextCactusTime
-// Thiết lập lại trạng thái chướng ngại vật (cactus) khi bắt đầu game
+// ==================== STATE ====================
+let nextCactusTime = 0
+
+// ==================== PUBLIC FUNCTIONS ====================
 export function setupCactus() {
   nextCactusTime = CACTUS_INTERVAL_MIN
-  document.querySelectorAll("[data-cactus]").forEach(cactus => {
-    cactus.remove()
-  })
+  
+  // Remove all existing cacti
+  document.querySelectorAll("[data-cactus]").forEach(cactus => cactus.remove())
 }
 
-// Cập nhật vị trí và sinh mới chướng ngại vật (cactus) theo thời gian
 export function updateCactus(delta, speedScale) {
+  // Move existing cacti
   document.querySelectorAll("[data-cactus]").forEach(cactus => {
     incrementCustomProperty(cactus, "--left", delta * speedScale * SPEED * -1)
+    
+    // Remove cacti that are off screen
     if (getCustomProperty(cactus, "--left") <= -100) {
       cactus.remove()
     }
   })
-
+  
+  // Spawn new cacti
   if (nextCactusTime <= 0) {
-    createCactus()
-    nextCactusTime =
-      randomNumberBetween(CACTUS_INTERVAL_MIN, CACTUS_INTERVAL_MAX) / speedScale
+    if (canSpawnCactus()) {
+      createCactus()
+    }
+    nextCactusTime = randomNumberBetween(CACTUS_INTERVAL_MIN, CACTUS_INTERVAL_MAX) / speedScale
   }
+  
   nextCactusTime -= delta
 }
 
@@ -43,12 +57,8 @@ export function getCactusRects() {
   })
 }
 
+// ==================== PRIVATE FUNCTIONS ====================
 function createCactus() {
-  const worldRect = document.querySelector('[data-world]').getBoundingClientRect()
-  const minDistance = worldRect.width * 0.35
-  // Lấy vị trí left (px) muốn spawn
-  const newLeft = worldRect.right
-  if (isObstacleTooCloseByLeft(newLeft, minDistance)) return // Không spawn nếu quá gần vật cản khác
   const cactus = document.createElement("img")
   cactus.dataset.cactus = true
   cactus.src = "imgs/cactus.png"
@@ -57,8 +67,25 @@ function createCactus() {
   worldElem.append(cactus)
 }
 
+function canSpawnCactus() {
+  const worldRect = worldElem.getBoundingClientRect()
+  const minDistance = worldRect.width * MIN_SPAWN_DISTANCE
+  
+  // Check distance from existing obstacles
+  const obstacles = document.querySelectorAll('[data-cactus]')
+  
+  for (const obs of obstacles) {
+    const obsRect = obs.getBoundingClientRect()
+    const distanceFromRight = worldRect.right - obsRect.left
+    
+    if (distanceFromRight < minDistance) {
+      return false
+    }
+  }
+  
+  return true
+}
+
 function randomNumberBetween(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min)
 }
-
-// Commit 16: Thêm comment nhỏ ở cuối file
